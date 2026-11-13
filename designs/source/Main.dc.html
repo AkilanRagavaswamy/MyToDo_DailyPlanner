@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height: 800px; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 14px">
+<dc-import name="TitleBar" theme="{{theme}}" hint-size="100%,48px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="NavPane" theme="{{theme}}" active="today" hint-size="248px,752px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; background: {{t.surface2}}; border-top-left-radius: 8px; border: 1px solid {{t.border}}; padding: 24px 28px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 24px; align-content: flex-start">
+<section style="flex: 999 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+<div>
+<h1 style="margin: 0; font-size: 28px; font-weight: 600; line-height: 1.2">Today</h1>
+<p style="margin: 4px 0 0; color: {{t.text2}}">Thursday, 12 November</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; min-width: 160px">
+<span style="font-size: 12px; color: {{t.text2}}">3 of 8 done</span>
+<div style="height: 4px; border-radius: 2px; background: {{t.border}}"><div style="width: 37.5%; height: 4px; border-radius: 2px; background: {{t.accentFill}}"></div></div>
+</div>
+</div>
+<div role="status" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; background: {{t.amberSoft}}; color: {{t.text}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.amber}}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3zM12 10v4M12 17h.01"></path></svg>
+<span style="flex: 1">2 reminders were missed while your PC was asleep.</span>
+<button style="font: inherit; padding: 5px 12px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}">Review</button>
+<button aria-label="Dismiss" style="font: inherit; width: 30px; height: 30px; border: 0; border-radius: 4px; background: transparent; color: {{t.text2}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<label style="display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: 6px; background: {{t.surface}}; border: 1px solid {{t.border}}; box-shadow: 0 1px 2px rgba(0,0,0,0.04)">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.accent}}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Add a task</span>
+<input type="text" placeholder="Add a task, e.g. “Call vendor tomorrow 3pm p1 #work”" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; color: {{t.text}}">
+<kbd style="font: inherit; font-size: 12px; padding: 2px 6px; border-radius: 4px; border: 1px solid {{t.border}}; color: {{t.text2}}">Ctrl+N</kbd>
+</label>
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 6px; background: {{t.accentSoft}}; flex-wrap: wrap">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.accent}}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2"></path></svg>
+<span style="flex: 1; min-width: 180px">Timer running on <strong style="font-weight: 600">Review Q4 roadmap deck</strong></span>
+<span style="font-variant-numeric: tabular-nums; font-weight: 600; color: {{t.accent}}">0:42:10</span>
+<button style="font: inherit; display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 4px; border: 0; background: {{t.accentFill}}; color: {{t.onAccent}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h12v12H6z"></path></svg>Stop</button>
+</div>
+<div style="display: flex; flex-direction: column; border-radius: 8px; background: {{t.surface}}; border: 1px solid {{t.border}}; overflow: hidden">
+<sc-for list="{{tasks}}" as="k" hint-placeholder-count="5">
+<div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-bottom: 1px solid {{t.border}}">
+<button aria-label="Complete {{k.title}}" style="flex: none; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; border: 2px solid {{k.ring}}; background: transparent; padding: 0"></button>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+<span style="font-weight: 500">{{k.title}}</span>
+<span style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: {{t.text2}}">
+<span>{{k.list}}</span>
+<span style="color: {{k.whenColor}}">{{k.when}}</span>
+<sc-if value="{{k.extra}}" hint-placeholder-val="{{true}}"><span>{{k.extra}}</span></sc-if>
+</span>
+</div>
+<span style="flex: none; font-size: 12px; font-weight: 600; color: {{k.prColor}}">{{k.pr}}</span>
+</div>
+</sc-for>
+<div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: 12px; font-weight: 600; color: {{t.text2}}; background: {{t.surface2}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>Completed · 3</div>
+<sc-for list="{{done}}" as="d" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-top: 1px solid {{t.border}}">
+<span style="flex: none; width: 20px; height: 20px; border-radius: 50%; background: {{t.accentFill}}; display: flex; align-items: center; justify-content: center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="{{t.onAccent}}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+<span style="color: {{t.text2}}; text-decoration: line-through">{{d}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+<aside aria-label="Today's schedule" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 8px; background: {{t.surface}}; border: 1px solid {{t.border}}; align-self: flex-start">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Schedule</h2>
+<a href="{{weekHref}}" style="font-size: 13px; color: {{t.accent}}; text-decoration: none">Open week</a>
+</div>
+<div style="position: relative; height: 484px; margin-left: 44px; background-image: repeating-linear-gradient(to bottom, {{t.border}} 0 1px, transparent 1px 44px)">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="11">
+<span style="position: absolute; left: -44px; top: {{h.top}}px; font-size: 11px; color: {{t.text2}}; transform: translateY(-6px)">{{h.label}}</span>
+</sc-for>
+<sc-for list="{{blocks}}" as="b" hint-placeholder-count="5">
+<div style="position: absolute; left: 4px; right: 0; top: {{b.top}}px; height: {{b.h}}px; box-sizing: border-box; padding: 4px 8px; border-radius: 4px; background: {{b.bg}}; color: {{b.fg}}; font-size: 12px; overflow: hidden">
+<strong style="font-weight: 600">{{b.title}}</strong> <span>{{b.time}}</span>
+</div>
+</sc-for>
+<div style="position: absolute; left: 4px; right: 0; top: 374px; height: 44px; box-sizing: border-box; border: 1.5px dashed {{t.accent}}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: {{t.accent}}">Drop a task here to block time</div>
+<div aria-label="Now, 11:05" style="position: absolute; left: -6px; right: 0; top: 135px; height: 2px; background: {{t.danger}}"><span style="position: absolute; left: 0; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: {{t.danger}}"></span></div>
+</div>
+</aside>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',surface:'#FFFFFF',surface2:'#F6F8F6',hover:'#E9EEEA',border:'#DCE2DE',text:'#1A1F1C',text2:'#56605A',accent:'#17784C',accentFill:'#187A4E',onAccent:'#FFFFFF',accentSoft:'#E2F2E9',amber:'#8F5500',amberSoft:'#FDF1DC',danger:'#B42318',dangerSoft:'#FDECEA',meetFill:'#E5EEFB',meetText:'#1D4E9A'},
+      dark: {bg:'#191C1A',surface:'#232725',surface2:'#2B302D',hover:'#323834',border:'#3A413C',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6',accentFill:'#4CC38A',onAccent:'#05130C',accentSoft:'#1C3A2B',amber:'#F4BC5C',amberSoft:'#3A2C12',danger:'#FF9A8F',dangerSoft:'#3D1F1C',meetFill:'#1F3150',meetText:'#AFCBF5'}
+    };
+    const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+    const t = T[theme];
+    const tasks = [
+      {title:'Review Q4 roadmap deck', list:'Work', when:'10:00 – 11:30 · blocked', extra:'2 attachments · reminders 1 h, 30 min, 15 min', pr:'P1', prColor:t.danger, ring:t.danger, whenColor:t.text2},
+      {title:'Reply to vendor contract email', list:'Work', when:'Due today', extra:'Reminder 9:00 AM sent', pr:'P2', prColor:t.amber, ring:t.amber, whenColor:t.amber},
+      {title:'Update test plan for sync', list:'Work', when:'15:30 – 16:30 · blocked', extra:'Subtasks 1 of 3', pr:'P3', prColor:t.text2, ring:t.text2, whenColor:t.text2},
+      {title:'Submit expense report', list:'Personal', when:'Due tomorrow', extra:'Reminder today 3:00 PM · 1 attachment', pr:'', prColor:t.text2, ring:t.text2, whenColor:t.text2},
+      {title:'Book dentist appointment', list:'Personal', when:'Today, no time', extra:'', pr:'', prColor:t.text2, ring:t.text2, whenColor:t.text2}
+    ];
+    const hours = [];
+    for (let i = 0; i <= 10; i++) hours.push({ top: i * 44, label: (8 + i) + ':00' });
+    const meet = { bg: t.meetFill, fg: t.meetText }, focus = { bg: t.accentSoft, fg: t.accent }, pers = { bg: t.amberSoft, fg: t.amber };
+    const blocks = [
+      {top:44, h:22, title:'Stand-up', time:'9:00', ...meet},
+      {top:88, h:66, title:'Review Q4 roadmap deck', time:'10:00 – 11:30', ...focus},
+      {top:198, h:33, title:'Lunch', time:'12:30', ...pers},
+      {top:264, h:44, title:'1:1 with Priya', time:'14:00 – 15:00', ...meet},
+      {top:330, h:44, title:'Update test plan for sync', time:'15:30 – 16:30', ...focus}
+    ];
+    return { theme, t, tasks, hours, blocks,
+      done: ['Write stand-up notes', 'Approve leave request', 'Renew parking pass'],
+      weekHref: theme === 'dark' ? 'Week-Dark.dc.html' : 'Week.dc.html' };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>MyTodo.Data</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MyTodo.Core\MyTodo.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Bundles e_sqlite3, which includes FTS5. -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0" />
+    <!--
+      Microsoft.Data.Sqlite 10.0.0 pulls in the native SQLite build
+      SQLitePCLRaw.lib.e_sqlite3 2.1.11, which carries CVE-2025-6965 (NU1903): in
+      SQLite before 3.50.2 the aggregate-term count can exceed the available
+      columns, corrupting memory. The advisory lists no patched 2.1.x release, so
+      we pin the native package forward instead. From 3.x its version number *is*
+      the bundled SQLite version, and the package holds only native binaries with
+      no dependencies of its own, so this leaves the managed SQLitePCLRaw.core /
+      provider 2.1.11 assemblies exactly as Microsoft.Data.Sqlite expects them.
+      Drop this once Microsoft.Data.Sqlite ships against a patched lib.
+    -->
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.50.3" />
+  </ItemGroup>
+</Project>

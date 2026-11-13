@@ -1,0 +1,91 @@
+<Page
+    x:Class="MyTodo.App.Views.CalendarPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:MyTodo.App.Controls">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Padding="20,14" ColumnSpacing="10" BorderBrush="{ThemeResource LineBrush}" BorderThickness="0,0,0,1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="MonthTitle" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
+            <Button Grid.Column="1" Content="Today" Click="Today_Click" ToolTipService.ToolTip="Home" />
+            <Button Grid.Column="2" Click="Prev_Click" AutomationProperties.Name="Previous (Ctrl+Left)"><FontIcon Glyph="&#xE76B;" FontSize="12" /></Button>
+            <Button Grid.Column="3" Click="Next_Click" AutomationProperties.Name="Next (Ctrl+Right)"><FontIcon Glyph="&#xE76C;" FontSize="12" /></Button>
+            <TextBlock x:Name="RangeText" Grid.Column="4" VerticalAlignment="Center" Style="{StaticResource SecondaryTextStyle}" />
+            <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="2" Padding="2" CornerRadius="6" BorderBrush="{ThemeResource LineBrush}" BorderThickness="1"
+                        Background="{ThemeResource SurfaceBrush}" AutomationProperties.Name="Calendar view">
+                <ToggleButton x:Name="DayButton" Content="Day" Click="View_Click" Tag="day" BorderThickness="0" ToolTipService.ToolTip="Alt+1" />
+                <ToggleButton x:Name="WorkWeekButton" Content="Work week" Click="View_Click" Tag="workweek" BorderThickness="0" ToolTipService.ToolTip="Alt+2" />
+                <ToggleButton x:Name="WeekButton" Content="Week" Click="View_Click" Tag="week" BorderThickness="0" ToolTipService.ToolTip="Alt+3" />
+                <ToggleButton x:Name="MonthButton" Content="Month" Click="View_Click" Tag="month" BorderThickness="0" ToolTipService.ToolTip="Alt+4" />
+            </StackPanel>
+            <Button Grid.Column="7" Style="{StaticResource AccentButtonStyle}" Click="NewEvent_Click" ToolTipService.ToolTip="Ctrl+Shift+N">
+                <StackPanel Orientation="Horizontal" Spacing="6"><FontIcon Glyph="&#xE710;" FontSize="12" /><TextBlock Text="New event" /></StackPanel>
+            </Button>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="230" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition x:Name="AgendaColumn" Width="0" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Padding="14" RowSpacing="8" BorderBrush="{ThemeResource LineBrush}" BorderThickness="0,0,1,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Unscheduled tasks" FontWeight="SemiBold" />
+                <TextBlock x:Name="PoolHint" Grid.Row="1" Style="{StaticResource SecondaryTextStyle}" />
+                <ListView x:Name="Pool" Grid.Row="2" CanDragItems="True" DragItemsStarting="Pool_DragItemsStarting" SelectionMode="None" AutomationProperties.Name="Unscheduled tasks">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="10,8" CornerRadius="6" BorderThickness="1" BorderBrush="{ThemeResource LineBrush}" Background="{ThemeResource SurfaceBrush}" Margin="0,2">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE76F;" FontSize="12" Foreground="{ThemeResource Text2Brush}" />
+                                    <TextBlock Text="{Binding Title}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="Padding" Value="0" /></Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+                <StackPanel Grid.Row="3" Spacing="6">
+                    <StackPanel Orientation="Horizontal" Spacing="8"><Rectangle Width="10" Height="10" RadiusX="2" RadiusY="2" Fill="{ThemeResource MeetingFillBrush}" Stroke="{ThemeResource MeetingTextBrush}" /><TextBlock Text="Meeting" Style="{StaticResource SecondaryTextStyle}" /></StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8"><Rectangle Width="10" Height="10" RadiusX="2" RadiusY="2" Fill="{ThemeResource FocusFillBrush}" Stroke="{ThemeResource FocusTextBrush}" /><TextBlock Text="Focus block" Style="{StaticResource SecondaryTextStyle}" /></StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8"><Rectangle Width="10" Height="10" RadiusX="2" RadiusY="2" Fill="{ThemeResource PersonalFillBrush}" Stroke="{ThemeResource PersonalTextBrush}" /><TextBlock Text="Personal" Style="{StaticResource SecondaryTextStyle}" /></StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <controls:WeekTimeline x:Name="Timeline" Grid.Column="1" Margin="0,0,12,0" />
+            <ScrollViewer x:Name="MonthHost" Grid.Column="1" Visibility="Collapsed">
+                <controls:MonthGrid x:Name="Month" />
+            </ScrollViewer>
+
+            <StackPanel x:Name="Agenda" Grid.Column="2" Padding="16" Spacing="8" Background="{ThemeResource SurfaceBrush}" BorderBrush="{ThemeResource LineBrush}" BorderThickness="1,0,0,0">
+                <TextBlock x:Name="AgendaTitle" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock x:Name="AgendaSummary" Style="{StaticResource SecondaryTextStyle}" />
+                <StackPanel x:Name="AgendaItems" Spacing="6" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

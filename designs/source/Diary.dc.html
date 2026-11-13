@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Diary</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height: 800px; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 14px">
+<dc-import name="TitleBar" theme="{{theme}}" hint-size="100%,48px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="NavPane" theme="{{theme}}" active="diary" hint-size="248px,752px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; background: {{t.surface2}}; border-top-left-radius: 8px; border: 1px solid {{t.border}}; box-sizing: border-box; display: flex; flex-wrap: wrap">
+<aside aria-label="Diary calendar" style="flex: 1 1 220px; max-width: 240px; box-sizing: border-box; padding: 18px 14px; border-right: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600">November 2026</h2>
+<span style="display: flex; gap: 2px">
+<button aria-label="Previous month" style="width: 28px; height: 28px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+<button aria-label="Next month" style="width: 28px; height: 28px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; text-align: center; font-size: 12px">
+<sc-for list="{{dows}}" as="w" hint-placeholder-count="7"><span style="color: {{t.text2}}; padding: 4px 0">{{w}}</span></sc-for>
+<sc-for list="{{mini}}" as="c" hint-placeholder-count="42">
+<span style="{{c.style}}">{{c.num}}<span style="width: 4px; height: 4px; border-radius: 50%; background: {{c.dot}}"></span></span>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 12px; color: {{t.text2}}">A dot marks a day with an entry.</p>
+<h2 style="margin: 4px 0 0; font-size: 13px; font-weight: 600">Recent entries</h2>
+<sc-for list="{{recent}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 6px; background: {{r.bg}}">
+<span style="font-size: 12px; font-weight: 600">{{r.date}}</span>
+<span style="font-size: 12px; color: {{t.text2}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.text}}</span>
+</div>
+</sc-for>
+</aside>
+<section style="flex: 999 1 380px; min-width: 0; padding: 20px 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+<div>
+<h1 style="margin: 0; font-size: 26px; font-weight: 600">Thursday, 12 November</h1>
+<p style="margin: 4px 0 0; font-size: 12px; color: {{t.text2}}">Saved on this PC · 11:04</p>
+</div>
+<span style="display: flex; gap: 6px">
+<button aria-label="Previous day" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+<button aria-label="Next day" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+</span>
+</div>
+<div role="toolbar" aria-label="Formatting" style="display: flex; gap: 2px; padding: 4px; border-radius: 6px; background: {{t.surface}}; border: 1px solid {{t.border}}; flex-wrap: wrap">
+<button aria-label="Bold (Ctrl+B)" style="width: 32px; height: 30px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}; font: inherit; font-weight: 700">B</button>
+<button aria-label="Italic (Ctrl+I)" style="width: 32px; height: 30px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}; font: inherit; font-style: italic">I</button>
+<button aria-label="Underline (Ctrl+U)" style="width: 32px; height: 30px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}; font: inherit; text-decoration: underline">U</button>
+<span style="width: 1px; margin: 4px 4px; background: {{t.border}}"></span>
+<button style="height: 30px; padding: 0 10px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}; font: inherit; font-size: 13px">Heading</button>
+<button aria-label="Bulleted list (Ctrl+Shift+L)" style="width: 32px; height: 30px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"></path></svg></button>
+<button aria-label="Insert link (Ctrl+K)" style="width: 32px; height: 30px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path></svg></button>
+</div>
+<article style="flex: 1 1 auto; padding: 20px 24px; border-radius: 8px; background: {{t.surface}}; border: 1px solid {{t.border}}; line-height: 1.6; max-width: 720px">
+<p style="margin: 0 0 12px">The morning went to the Q4 roadmap review. The revenue slide didn’t match last week’s forecast, so I flagged it to Priya ahead of our 1:1.</p>
+<h2 style="margin: 16px 0 6px; font-size: 16px; font-weight: 600">Decisions</h2>
+<ul style="margin: 0 0 12px; padding-left: 20px">
+<li>Move the sync feature demo to Friday’s sprint demo.</li>
+<li>Keep the Q1 hiring plan draft for Monday.</li>
+</ul>
+<h2 style="margin: 16px 0 6px; font-size: 16px; font-weight: 600">For tomorrow</h2>
+<ul style="margin: 0; padding-left: 20px">
+<li>Finish the two open subtasks on the test plan.</li>
+<li>Send the weekly status email before 17:00.</li>
+</ul>
+</article>
+</section>
+<aside aria-label="Day at a glance" style="flex: 1 1 260px; max-width: 300px; box-sizing: border-box; padding: 20px 16px; border-left: 1px solid {{t.border}}; background: {{t.surface}}; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600">Completed today · 3</h2>
+<sc-for list="{{done}}" as="d" hint-placeholder-count="3">
+<span style="display: flex; align-items: center; gap: 8px; font-size: 13px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{t.accent}}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>{{d}}</span>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600">Meetings · 2</h2>
+<span style="font-size: 13px; color: {{t.meetText}}">9:00 Stand-up</span>
+<span style="font-size: 13px; color: {{t.meetText}}">14:00 1:1 with Priya</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 8px; background: {{t.surface2}}; border: 1px solid {{t.border}}">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600">End-of-day summary</h2>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; font-size: 13px">
+<span style="color: {{t.text2}}">Completed</span><span>3 tasks</span>
+<span style="color: {{t.text2}}">Slipped</span><span style="color: {{t.amber}}">1 task</span>
+<span style="color: {{t.text2}}">Work</span><span>2 h 40 min</span>
+<span style="color: {{t.text2}}">Personal</span><span>30 min</span>
+</div>
+<button style="font: inherit; font-size: 13px; padding: 7px 12px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}">Insert summary into entry</button>
+</div>
+</aside>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',surface:'#FFFFFF',surface2:'#F6F8F6',hover:'#E9EEEA',border:'#DCE2DE',text:'#1A1F1C',text2:'#56605A',accent:'#17784C',accentFill:'#187A4E',onAccent:'#FFFFFF',accentSoft:'#E2F2E9',amber:'#8F5500',amberSoft:'#FDF1DC',danger:'#B42318',dangerSoft:'#FDECEA',meetFill:'#E5EEFB',meetText:'#1D4E9A'},
+      dark: {bg:'#191C1A',surface:'#232725',surface2:'#2B302D',hover:'#323834',border:'#3A413C',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6',accentFill:'#4CC38A',onAccent:'#05130C',accentSoft:'#1C3A2B',amber:'#F4BC5C',amberSoft:'#3A2C12',danger:'#FF9A8F',dangerSoft:'#3D1F1C',meetFill:'#1F3150',meetText:'#AFCBF5'}
+    };
+    const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+    const t = T[theme];
+    const has = [2, 3, 4, 5, 6, 9, 10, 11, 12];
+    const mini = [];
+    for (let i = 0; i < 42; i++) {
+      let num, inMonth = true;
+      if (i < 6) { num = 26 + i; inMonth = false; } else if (i - 5 <= 30) { num = i - 5; } else { num = i - 35; inMonth = false; }
+      const sel = inMonth && num === 12;
+      mini.push({ num: String(num), dot: inMonth && has.indexOf(num) >= 0 ? (sel ? t.onAccent : t.accent) : 'transparent',
+        style: 'display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 0 3px; border-radius: 4px; color: ' + (sel ? t.onAccent : inMonth ? t.text : t.text2) + '; background: ' + (sel ? t.accentFill : 'transparent') + ';' + (inMonth ? '' : ' opacity: 0.6;') });
+    }
+    return { theme, t, mini,
+      dows: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+      recent: [
+        { date: 'Thu 12 Nov', text: 'The morning went to the Q4 roadmap review.', bg: t.accentSoft },
+        { date: 'Wed 11 Nov', text: 'Architecture review ran long; test plan moved.', bg: 'transparent' },
+        { date: 'Tue 10 Nov', text: 'Vendor call: new contract terms by Friday.', bg: 'transparent' },
+        { date: 'Mon 9 Nov', text: 'Sprint planning, 34 points committed.', bg: 'transparent' }
+      ],
+      done: ['Write stand-up notes', 'Approve leave request', 'Renew parking pass'] };
+  }
+}
+</script>
+</body>
+</html>

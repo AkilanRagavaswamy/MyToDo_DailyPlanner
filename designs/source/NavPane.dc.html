@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Navigation pane</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<nav aria-label="Main" style="width: 248px; min-height: 752px; box-sizing: border-box; padding: 8px 8px 12px; display: flex; flex-direction: column; gap: 2px; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 14px">
+<a href="{{newHref}}" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 36px; margin: 4px 4px 12px; border-radius: 4px; background: {{t.accentFill}}; color: {{t.onAccent}}; text-decoration: none; font-weight: 600">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>New task
+</a>
+<sc-for list="{{main}}" as="it" hint-placeholder-count="5">
+<a href="{{it.href}}" aria-current="{{it.cur}}" style="{{it.style}}">
+<span style="width: 3px; height: 16px; border-radius: 2px; background: {{it.pill}}"></span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{it.d}}"></path></svg>
+<span style="flex: 1">{{it.label}}</span>
+<span style="font-size: 12px; color: {{t.text2}}">{{it.count}}</span>
+</a>
+<sc-if value="{{it.showLists}}" hint-placeholder-val="{{false}}">
+<sc-for list="{{lists}}" as="l" hint-placeholder-count="5">
+<a href="{{l.href}}" style="display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 12px 0 46px; border-radius: 4px; color: {{t.text}}; text-decoration: none; font-size: 13px">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: {{l.dot}}"></span>
+<span style="flex: 1">{{l.label}}</span>
+<span style="font-size: 12px; color: {{t.text2}}">{{l.count}}</span>
+</a>
+</sc-for>
+</sc-if>
+</sc-for>
+<div style="flex: 1 1 auto"></div>
+<a href="{{settingsHref}}" aria-current="{{settingsCur}}" style="{{settingsStyle}}">
+<span style="width: 3px; height: 16px; border-radius: 2px; background: {{settingsPill}}"></span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3 1a7.4 7.4 0 0 0-1.7-1L15 3.6h-4l-.4 2.5a7.4 7.4 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7.4 7.4 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7.4 7.4 0 0 0 1.7-1l2.3 1 2-3.4z"></path></svg>
+<span style="flex: 1">Settings</span>
+</a>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"active":{"editor":"enum","options":["today","lists","calendar","diary","insights","search","settings"],"default":"today"},"$preview":{"width":248,"height":752}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',hover:'#E2E8E4',text:'#1A1F1C',text2:'#56605A',accent:'#17784C',accentFill:'#187A4E',onAccent:'#FFFFFF'},
+      dark: {bg:'#191C1A',hover:'#2C322E',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6',accentFill:'#4CC38A',onAccent:'#05130C'}
+    };
+    const dark = this.props.theme === 'dark';
+    const t = T[dark ? 'dark' : 'light'];
+    const active = this.props.active ?? 'today';
+    const f = (light, darkName) => dark ? darkName : light;
+    const base = 'display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 12px 0 0; border-radius: 4px; text-decoration: none; color: ' + t.text + ';';
+    const styleFor = (on) => base + (on ? ' background: ' + t.hover + '; font-weight: 600;' : '');
+    const main = [
+      {key:'today', label:'Today', count:'5', d:'M12 4V2M12 22v-2M4 12H2M22 12h-2M5.6 5.6 4.2 4.2M19.8 19.8l-1.4-1.4M5.6 18.4l-1.4 1.4M19.8 4.2l-1.4 1.4M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', href:f('Main.dc.html','Today-Dark.dc.html')},
+      {key:'lists', label:'Lists', count:'', d:'M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01', href:f('Lists.dc.html','Lists-Dark.dc.html')},
+      {key:'calendar', label:'Calendar', count:'', d:'M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v12a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5zM4 10h16M8 3v4M16 3v4', href:f('Week.dc.html','Week-Dark.dc.html')},
+      {key:'diary', label:'Diary', count:'', d:'M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3M9 7h6', href:f('Diary.dc.html','Diary-Dark.dc.html')},
+      {key:'insights', label:'Insights', count:'', d:'M4 20h16M7 16v-5M12 16V7M17 16v-8', href:f('Insights.dc.html','Insights-Dark.dc.html')}
+    ].map(it => ({ ...it, cur: it.key === active ? 'page' : 'false', style: styleFor(it.key === active), pill: it.key === active ? t.accent : 'transparent', showLists: it.key === 'lists' }));
+    const lh = f('Lists.dc.html','Lists-Dark.dc.html');
+    const lists = [
+      {label:'Inbox', count:'4', dot:'#7C8A82', href:lh},
+      {label:'Work', count:'12', dot:'#1F8A5B', href:lh},
+      {label:'Personal', count:'5', dot:'#F4A62A', href:lh},
+      {label:'Learning', count:'3', dot:'#4A7FD6', href:lh},
+      {label:'Archive', count:'', dot:'transparent', href:lh}
+    ];
+    const sOn = active === 'settings';
+    return { t, main, lists, newHref: lh,
+      settingsHref: f('Settings.dc.html','Settings-Dark.dc.html'), settingsCur: sOn ? 'page' : 'false', settingsStyle: styleFor(sOn), settingsPill: sOn ? t.accent : 'transparent' };
+  }
+}
+</script>
+</body>
+</html>
