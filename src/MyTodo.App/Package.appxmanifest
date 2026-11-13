@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap5 desktop com rescap">
+
+  <!-- Name and Publisher are replaced by "Associate App with the Store" in Visual Studio. -->
+  <Identity Name="MyToDo.DailyPlanner" Publisher="CN=MyTodoDeveloper" Version="1.0.0.0" />
+
+  <Properties>
+    <DisplayName>My To-Do : Daily Planner</DisplayName>
+    <PublisherDisplayName>My To-Do</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
+      <uap:VisualElements
+        DisplayName="My To-Do : Daily Planner"
+        Description="Tasks, calendar, reminders and a work diary that stay on this PC."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="Assets\Square310x310Logo.png" />
+        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#1F8A5B" />
+      </uap:VisualElements>
+
+      <Extensions>
+        <!-- Toast activation (reminder buttons work while the app is closed). -->
+        <desktop:Extension Category="windows.toastNotificationActivation">
+          <desktop:ToastNotificationActivation ToastActivatorCLSID="7C2B5E3A-8F1D-4E6B-9A0C-2D4F6B8E1A35" />
+        </desktop:Extension>
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:ExeServer Executable="MyTodo.App.exe" Arguments="----AppNotificationActivated:" DisplayName="My To-Do reminders">
+              <com:Class Id="7C2B5E3A-8F1D-4E6B-9A0C-2D4F6B8E1A35" />
+            </com:ExeServer>
+          </com:ComServer>
+        </com:Extension>
+        <!-- Launch at Windows startup (WIN-02); the user enables it in Settings or on first run. -->
+        <uap5:Extension Category="windows.startupTask">
+          <uap5:StartupTask TaskId="MyTodoStartup" Enabled="false" DisplayName="My To-Do : Daily Planner" />
+        </uap5:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <!-- No internetClient capability: 1.0.0.0 makes no network calls. -->
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

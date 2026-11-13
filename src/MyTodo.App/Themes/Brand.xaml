@@ -1,0 +1,93 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Theme-aware brand brushes (screen designs, light and dark). Code looks these up through Ui.Brush(). -->
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#EEF2EF" />
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="Surface2Brush" Color="#F6F8F6" />
+            <SolidColorBrush x:Key="LineBrush" Color="#DCE2DE" />
+            <SolidColorBrush x:Key="TextBrush" Color="#1A1F1C" />
+            <SolidColorBrush x:Key="Text2Brush" Color="#56605A" />
+            <SolidColorBrush x:Key="BrandAccentBrush" Color="#17784C" />
+            <SolidColorBrush x:Key="BrandAccentFillBrush" Color="#187A4E" />
+            <SolidColorBrush x:Key="OnAccentBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AccentSoftBrush" Color="#E2F2E9" />
+            <SolidColorBrush x:Key="AmberBrush" Color="#8F5500" />
+            <SolidColorBrush x:Key="AmberSoftBrush" Color="#FDF1DC" />
+            <SolidColorBrush x:Key="DangerBrush" Color="#B42318" />
+            <SolidColorBrush x:Key="DangerSoftBrush" Color="#FDECEA" />
+            <SolidColorBrush x:Key="MeetingFillBrush" Color="#E5EEFB" />
+            <SolidColorBrush x:Key="MeetingTextBrush" Color="#1D4E9A" />
+            <SolidColorBrush x:Key="FocusFillBrush" Color="#E2F2E9" />
+            <SolidColorBrush x:Key="FocusTextBrush" Color="#17784C" />
+            <SolidColorBrush x:Key="PersonalFillBrush" Color="#FDF1DC" />
+            <SolidColorBrush x:Key="PersonalTextBrush" Color="#8F5500" />
+            <SolidColorBrush x:Key="NowLineBrush" Color="#B42318" />
+            <SolidColorBrush x:Key="GridLineBrush" Color="#DCE2DE" />
+            <SolidColorBrush x:Key="WeekendBrush" Color="#EEF2EF" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#191C1A" />
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#232725" />
+            <SolidColorBrush x:Key="Surface2Brush" Color="#2B302D" />
+            <SolidColorBrush x:Key="LineBrush" Color="#3A413C" />
+            <SolidColorBrush x:Key="TextBrush" Color="#F1F4F2" />
+            <SolidColorBrush x:Key="Text2Brush" Color="#B2BBB5" />
+            <SolidColorBrush x:Key="BrandAccentBrush" Color="#72D9A6" />
+            <SolidColorBrush x:Key="BrandAccentFillBrush" Color="#4CC38A" />
+            <SolidColorBrush x:Key="OnAccentBrush" Color="#05130C" />
+            <SolidColorBrush x:Key="AccentSoftBrush" Color="#1C3A2B" />
+            <SolidColorBrush x:Key="AmberBrush" Color="#F4BC5C" />
+            <SolidColorBrush x:Key="AmberSoftBrush" Color="#3A2C12" />
+            <SolidColorBrush x:Key="DangerBrush" Color="#FF9A8F" />
+            <SolidColorBrush x:Key="DangerSoftBrush" Color="#3D1F1C" />
+            <SolidColorBrush x:Key="MeetingFillBrush" Color="#1F3150" />
+            <SolidColorBrush x:Key="MeetingTextBrush" Color="#AFCBF5" />
+            <SolidColorBrush x:Key="FocusFillBrush" Color="#1C3A2B" />
+            <SolidColorBrush x:Key="FocusTextBrush" Color="#72D9A6" />
+            <SolidColorBrush x:Key="PersonalFillBrush" Color="#3A2C12" />
+            <SolidColorBrush x:Key="PersonalTextBrush" Color="#F4BC5C" />
+            <SolidColorBrush x:Key="NowLineBrush" Color="#FF9A8F" />
+            <SolidColorBrush x:Key="GridLineBrush" Color="#3A413C" />
+            <SolidColorBrush x:Key="WeekendBrush" Color="#191C1A" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+    <Style x:Key="CardBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource LineBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16" />
+    </Style>
+
+    <Style x:Key="PageTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+
+    <Style x:Key="SecondaryTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{ThemeResource Text2Brush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="SettingsRowStyle" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource LineBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="14,10" />
+        <Setter Property="MinHeight" Value="60" />
+        <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+</ResourceDictionary>

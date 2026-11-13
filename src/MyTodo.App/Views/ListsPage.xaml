@@ -1,0 +1,71 @@
+<Page
+    x:Class="MyTodo.App.Views.ListsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MyTodo.App.Views">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="420" />
+            <ColumnDefinition x:Name="DetailColumn" Width="0" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Padding="28,20,28,0" RowSpacing="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Ellipse x:Name="ListDot" Width="12" Height="12" VerticalAlignment="Center" />
+                <TextBlock x:Name="TitleText" Grid.Column="1" Style="{StaticResource PageTitleStyle}" TextTrimming="CharacterEllipsis" />
+                <ComboBox x:Name="SortCombo" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="Options_Changed" AutomationProperties.Name="Sort">
+                    <x:String>Sort: Due date</x:String>
+                    <x:String>Sort: Priority</x:String>
+                    <x:String>Sort: Manual</x:String>
+                </ComboBox>
+                <ComboBox x:Name="TagCombo" Grid.Column="3" VerticalAlignment="Center" SelectionChanged="Options_Changed" AutomationProperties.Name="Filter by tag" />
+                <DropDownButton x:Name="ListMenuButton" Grid.Column="4" VerticalAlignment="Center" AutomationProperties.Name="List options">
+                    <FontIcon Glyph="&#xE712;" FontSize="14" />
+                    <DropDownButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Rename list" Click="RenameList_Click" />
+                            <MenuFlyoutItem Text="Delete list" Click="DeleteList_Click" />
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+            </Grid>
+            <TextBox x:Name="AddBox" Grid.Row="1" PlaceholderText="Add a task to this list (Ctrl+N)" KeyDown="AddBox_KeyDown" AutomationProperties.Name="Add a task" />
+            <InfoBar x:Name="UndoBar" Grid.Row="2" IsOpen="False" Severity="Informational" />
+            <ListView x:Name="TaskList" Grid.Row="3" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="TaskList_ItemClick"
+                      ItemTemplateSelector="{StaticResource TaskRowSelector}" CanDragItems="True" DragItemsStarting="TaskList_DragItemsStarting"
+                      DragItemsCompleted="TaskList_DragItemsCompleted" RightTapped="TaskList_RightTapped" Padding="0,0,0,24"
+                      AutomationProperties.Name="Tasks">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Delete" Invoked="DeleteKey_Invoked" />
+                    <KeyboardAccelerator Key="Enter" Modifiers="Control" Invoked="CompleteKey_Invoked" />
+                    <KeyboardAccelerator Key="Up" Modifiers="Menu" Invoked="MoveUp_Invoked" />
+                    <KeyboardAccelerator Key="Down" Modifiers="Menu" Invoked="MoveDown_Invoked" />
+                </ListView.KeyboardAccelerators>
+            </ListView>
+            <TextBlock x:Name="EmptyText" Grid.Row="3" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource SecondaryTextStyle}" />
+        </Grid>
+
+        <Border x:Name="DetailHost" Grid.Column="1" BorderBrush="{ThemeResource LineBrush}" BorderThickness="1,0,0,0" Visibility="Collapsed">
+            <local:TaskDetailPanel x:Name="Detail" />
+        </Border>
+    </Grid>
+</Page>

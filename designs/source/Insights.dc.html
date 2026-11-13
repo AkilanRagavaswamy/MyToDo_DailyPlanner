@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Insights</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height: 900px; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 14px">
+<dc-import name="TitleBar" theme="{{theme}}" hint-size="100%,48px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="NavPane" theme="{{theme}}" active="insights" hint-size="248px,752px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; background: {{t.surface2}}; border-top-left-radius: 8px; border: 1px solid {{t.border}}; box-sizing: border-box; padding: 24px 28px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+<h1 style="margin: 0; font-size: 28px; font-weight: 600; flex: 1">Insights</h1>
+<button aria-label="Previous week" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+<span style="font-weight: 600">Week of 2 – 8 November 2026</span>
+<button aria-label="Next week" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+<button style="font: inherit; padding: 6px 12px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}">Export CSV</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px">
+<sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+<div style="padding: 14px 16px; border-radius: 8px; background: {{t.surface}}; border: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; color: {{t.text2}}">{{k.label}}</span>
+<span style="font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums">{{k.value}}</span>
+<span style="font-size: 12px; color: {{t.text2}}">{{k.note}}</span>
+</div>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px">
+<sc-for list="{{charts}}" as="c" hint-placeholder-count="2">
+<div style="padding: 16px; border-radius: 8px; background: {{t.surface}}; border: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600">{{c.title}}</h2>
+<div role="img" aria-label="{{c.aria}}" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; align-items: end; height: 170px; border-bottom: 1px solid {{t.border}}">
+<sc-for list="{{c.bars}}" as="b" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%">
+<span style="font-size: 11px; color: {{t.text2}}; font-variant-numeric: tabular-nums">{{b.label}}</span>
+<div style="width: 70%; max-width: 34px; height: {{b.h}}px; border-radius: 3px 3px 0 0; background: {{c.color}}"></div>
+</div>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; text-align: center; font-size: 12px; color: {{t.text2}}">
+<sc-for list="{{dows}}" as="w" hint-placeholder-count="7"><span>{{w}}</span></sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px">
+<div style="padding: 16px; border-radius: 8px; background: {{t.surface}}; border: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600">Last 8 weeks: tasks completed and hours spent</h2>
+<div role="img" aria-label="Tasks completed per week, from 18 to 23" style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; align-items: end; height: 130px; border-bottom: 1px solid {{t.border}}">
+<sc-for list="{{trend}}" as="w" hint-placeholder-count="8">
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%">
+<span style="font-size: 11px; color: {{t.text2}}">{{w.tasks}}</span>
+<div style="width: 70%; height: {{w.h}}px; border-radius: 3px 3px 0 0; background: {{w.color}}"></div>
+</div>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; text-align: center; font-size: 11px; color: {{t.text2}}">
+<sc-for list="{{trend}}" as="w" hint-placeholder-count="8"><span>{{w.label}}<br>{{w.hours}}</span></sc-for>
+</div>
+</div>
+<div style="padding: 16px; border-radius: 8px; background: {{t.surface}}; border: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 10px; overflow-x: auto">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600">By list and tag</h2>
+<table style="width: 100%; border-collapse: collapse; font-size: 13px">
+<thead><tr><th scope="col" style="text-align: left; font-weight: 600; color: {{t.text2}}; padding: 6px 0; border-bottom: 1px solid {{t.border}}">Name</th><th scope="col" style="text-align: right; font-weight: 600; color: {{t.text2}}; padding: 6px 0; border-bottom: 1px solid {{t.border}}">Tasks</th><th scope="col" style="text-align: right; font-weight: 600; color: {{t.text2}}; padding: 6px 0; border-bottom: 1px solid {{t.border}}">Time spent</th></tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<tr><td style="padding: 7px 0; border-bottom: 1px solid {{t.border}}">{{r.name}}</td><td style="text-align: right; padding: 7px 0; border-bottom: 1px solid {{t.border}}; font-variant-numeric: tabular-nums">{{r.tasks}}</td><td style="text-align: right; padding: 7px 0; border-bottom: 1px solid {{t.border}}; font-variant-numeric: tabular-nums">{{r.time}}</td></tr>
+</sc-for>
+</tbody>
+</table>
+<p style="margin: 0; font-size: 12px; color: {{t.text2}}">A task with several tags counts once under each tag.</p>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',surface:'#FFFFFF',surface2:'#F6F8F6',hover:'#E9EEEA',border:'#DCE2DE',text:'#1A1F1C',text2:'#56605A',accent:'#17784C',accentFill:'#187A4E',onAccent:'#FFFFFF',accentSoft:'#E2F2E9',amber:'#8F5500',amberSoft:'#FDF1DC',amberFill:'#D98C10',danger:'#B42318',meetText:'#1D4E9A'},
+      dark: {bg:'#191C1A',surface:'#232725',surface2:'#2B302D',hover:'#323834',border:'#3A413C',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6',accentFill:'#4CC38A',onAccent:'#05130C',accentSoft:'#1C3A2B',amber:'#F4BC5C',amberSoft:'#3A2C12',amberFill:'#F4BC5C',danger:'#FF9A8F',meetText:'#AFCBF5'}
+    };
+    const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+    const t = T[theme];
+    const tasks = [4, 5, 3, 6, 4, 1, 0], hrs = [5.5, 6, 4.5, 6.5, 3.5, 0.67, 0];
+    const fmtH = (h) => { const m = Math.round(h * 60); return m === 0 ? '0' : Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0'); };
+    const charts = [
+      { title: 'Tasks completed per day', color: t.accentFill, aria: 'Tasks completed Monday to Sunday: 4, 5, 3, 6, 4, 1, 0', bars: tasks.map(v => ({ label: String(v), h: Math.round(v / 6 * 130) })) },
+      { title: 'Hours spent per day', color: t.amberFill, aria: 'Hours spent Monday to Sunday: 5.5, 6, 4.5, 6.5, 3.5, 0.7, 0', bars: hrs.map(v => ({ label: fmtH(v), h: Math.round(v / 7 * 130) })) }
+    ];
+    const tl = [['14 Sep', 18, '22 h'], ['21 Sep', 21, '25 h'], ['28 Sep', 17, '20 h'], ['5 Oct', 24, '28 h'], ['12 Oct', 20, '24 h'], ['19 Oct', 19, '23 h'], ['26 Oct', 22, '25 h'], ['2 Nov', 23, '26.7 h']];
+    const trend = tl.map((w, i) => ({ label: w[0], tasks: String(w[1]), hours: w[2], h: Math.round(w[1] / 24 * 96), color: i === 7 ? t.accentFill : t.accentSoft }));
+    return { theme, t, charts, trend,
+      dows: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      kpis: [
+        { label: 'Tasks completed', value: '23', note: '1 more than the week before' },
+        { label: 'Time spent', value: '26 h 40 min', note: 'Timer, time blocks and manual entries' },
+        { label: 'Planned vs actual', value: '30 h / 26 h 40', note: '89% of blocked time used' },
+        { label: 'Average per task', value: '1 h 10 min', note: 'Completed tasks only' }
+      ],
+      rows: [
+        { name: 'Work', tasks: '15', time: '19 h 00 min' }, { name: 'Personal', tasks: '5', time: '3 h 00 min' }, { name: 'Learning', tasks: '3', time: '4 h 40 min' },
+        { name: '#q4', tasks: '6', time: '9 h 20 min' }, { name: '#planning', tasks: '4', time: '5 h 00 min' }, { name: '#admin', tasks: '5', time: '2 h 10 min' }
+      ] };
+  }
+}
+</script>
+</body>
+</html>

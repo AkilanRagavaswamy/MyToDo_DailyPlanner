@@ -1,0 +1,76 @@
+<Window
+    x:Class="MyTodo.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="My To-Do : Daily Planner">
+
+    <Grid x:Name="Root">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Custom title bar: icon, title, search (passthrough region), caption buttons drawn by Windows. -->
+        <Grid x:Name="AppTitleBar" Height="48" Padding="14,0,140,0" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Image Source="ms-appx:///Assets/Square44x44Logo.targetsize-24_altform-unplated.png" Width="20" Height="20" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="My To-Do : Daily Planner" FontSize="12" VerticalAlignment="Center" />
+            <AutoSuggestBox x:Name="SearchBox" Grid.Column="2" MaxWidth="440" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                            PlaceholderText="Search tasks, events, diary (Ctrl+F)" QueryIcon="Find"
+                            AutomationProperties.Name="Search tasks, events and diary"
+                            TextChanged="SearchBox_TextChanged" QuerySubmitted="SearchBox_QuerySubmitted" />
+        </Grid>
+
+        <NavigationView x:Name="Nav" Grid.Row="1" PaneDisplayMode="Left" OpenPaneLength="248"
+                        IsBackButtonVisible="Collapsed" IsSettingsVisible="False" IsPaneToggleButtonVisible="True"
+                        SelectionChanged="Nav_SelectionChanged">
+            <NavigationView.PaneHeader>
+                <Button x:Name="NewTaskButton" Margin="4,4,4,8" HorizontalAlignment="Stretch" Style="{StaticResource AccentButtonStyle}"
+                        Click="NewTask_Click" ToolTipService.ToolTip="New task (Ctrl+N)">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE710;" FontSize="14" />
+                        <TextBlock Text="New task" FontWeight="SemiBold" />
+                    </StackPanel>
+                </Button>
+            </NavigationView.PaneHeader>
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Today" Tag="today">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE706;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem x:Name="ListsItem" Content="Lists" Tag="lists" SelectsOnInvoked="True" IsExpanded="True">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE8FD;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Calendar" Tag="calendar">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE787;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Diary" Tag="diary">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE736;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Insights" Tag="insights">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE9D2;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem Content="Keyboard shortcuts" Tag="shortcuts">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE765;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Settings" Tag="settings">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE713;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <InfoBar x:Name="GlobalInfo" IsOpen="False" Margin="12,8,12,0" />
+                <Frame x:Name="ContentFrame" Grid.Row="1" />
+            </Grid>
+        </NavigationView>
+    </Grid>
+</Window>

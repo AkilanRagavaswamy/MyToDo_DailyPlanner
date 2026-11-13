@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>First run</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height: 800px; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 14px">
+<dc-import name="TitleBar" theme="{{theme}}" hint-size="100%,48px"></dc-import>
+<main style="flex: 1 1 auto; display: flex; align-items: center; justify-content: center; padding: 32px 20px; box-sizing: border-box">
+<div style="width: 100%; max-width: 560px; padding: 36px 40px; box-sizing: border-box; border-radius: 12px; background: {{t.surface}}; border: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; align-items: center; gap: 16px">
+<svg width="64" height="64" viewBox="0 0 512 512" role="img" aria-label="My To-Do : Daily Planner icon"><rect x="40" y="64" width="432" height="416" rx="104" fill="#1F8A5B"></rect><rect x="148" y="28" width="44" height="92" rx="22" fill="#0E5A37"></rect><rect x="320" y="28" width="44" height="92" rx="22" fill="#0E5A37"></rect><path d="M142 300 L222 378 L350 230" fill="none" stroke="#FFFFFF" stroke-width="58" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="394" cy="180" r="38" fill="#F4A62A"></circle></svg>
+<div>
+<h1 style="margin: 0; font-size: 24px; font-weight: 600">Welcome to My To-Do</h1>
+<p style="margin: 4px 0 0; color: {{t.text2}}">Your tasks, calendar and diary, on this PC.</p>
+</div>
+</div>
+<p style="margin: 0; line-height: 1.55">Everything works offline and stays on this PC. Sign in with Google only if you want a private backup in your Google Drive and your data back after a reinstall.</p>
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 8px; background: {{t.surface2}}; border: 1px solid {{t.border}}">
+<div role="radiogroup" aria-label="Theme" style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+<span style="flex: 1 1 120px; font-weight: 500">Theme</span>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px"><input type="radio" name="w-theme-{{theme}}" style="accent-color: {{t.accentFill}}; margin: 0">Light</label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px"><input type="radio" name="w-theme-{{theme}}" style="accent-color: {{t.accentFill}}; margin: 0">Dark</label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px"><input type="radio" name="w-theme-{{theme}}" checked style="accent-color: {{t.accentFill}}; margin: 0">Use system setting</label>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 500">Launch at Windows startup</span><span style="font-size: 12px; color: {{t.text2}}">So reminders arrive even if you forget to open the app</span></span>
+<button role="switch" aria-checked="true" aria-label="Launch at Windows startup" style="position: relative; width: 40px; height: 20px; border-radius: 10px; padding: 0; border: 1px solid {{t.accentFill}}; background: {{t.accentFill}}"><span style="position: absolute; top: 3px; left: 23px; width: 12px; height: 12px; border-radius: 50%; background: {{t.onAccent}}"></span></button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 500">Reminder sound</span><span style="font-size: 12px; color: {{t.text2}}">Reminders 1 hour, 30 minutes and 15 minutes before</span></span>
+<button role="switch" aria-checked="true" aria-label="Reminder sound" style="position: relative; width: 40px; height: 20px; border-radius: 10px; padding: 0; border: 1px solid {{t.accentFill}}; background: {{t.accentFill}}"><span style="position: absolute; top: 3px; left: 23px; width: 12px; height: 12px; border-radius: 50%; background: {{t.onAccent}}"></span></button>
+</div>
+</div>
+<div style="display: flex; gap: 10px; flex-wrap: wrap">
+<a href="{{todayHref}}" style="flex: 1 1 200px; display: flex; align-items: center; justify-content: center; height: 40px; border-radius: 4px; background: {{t.accentFill}}; color: {{t.onAccent}}; font-weight: 600; text-decoration: none">Start using offline</a>
+<a href="{{todayHref}}" style="flex: 1 1 200px; display: flex; align-items: center; justify-content: center; height: 40px; border-radius: 4px; background: {{t.surface}}; color: {{t.text}}; border: 1px solid {{t.border}}; font-weight: 500; text-decoration: none">Sign in with Google</a>
+</div>
+<p style="margin: 0; font-size: 12px; color: {{t.text2}}; line-height: 1.5">You can sign in later from Settings. The app only gets a hidden folder in your Drive and your email address; it cannot see your other files, mail or calendar.</p>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',surface:'#FFFFFF',surface2:'#F6F8F6',border:'#DCE2DE',text:'#1A1F1C',text2:'#56605A',accent:'#17784C',accentFill:'#187A4E',onAccent:'#FFFFFF'},
+      dark: {bg:'#191C1A',surface:'#232725',surface2:'#2B302D',border:'#3A413C',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6',accentFill:'#4CC38A',onAccent:'#05130C'}
+    };
+    const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+    return { theme, t: T[theme], todayHref: theme === 'dark' ? 'Today-Dark.dc.html' : 'Main.dc.html' };
+  }
+}
+</script>
+</body>
+</html>

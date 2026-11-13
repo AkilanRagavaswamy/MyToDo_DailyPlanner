@@ -1,0 +1,61 @@
+<Page
+    x:Class="MyTodo.App.Views.InsightsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer>
+        <StackPanel Padding="28,20" Spacing="18">
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Insights" Style="{StaticResource PageTitleStyle}" />
+                <Button Grid.Column="1" Click="Prev_Click" VerticalAlignment="Center" AutomationProperties.Name="Previous week"><FontIcon Glyph="&#xE76B;" FontSize="12" /></Button>
+                <TextBlock x:Name="WeekText" Grid.Column="2" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <Button Grid.Column="3" Click="Next_Click" VerticalAlignment="Center" AutomationProperties.Name="Next week"><FontIcon Glyph="&#xE76C;" FontSize="12" /></Button>
+                <Button Grid.Column="4" Content="Export CSV" Click="Export_Click" VerticalAlignment="Center" />
+            </Grid>
+            <Grid x:Name="Kpis" ColumnSpacing="12" />
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Style="{StaticResource CardBorderStyle}">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Tasks completed per day" FontWeight="SemiBold" />
+                        <Grid x:Name="TasksChart" Height="200" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Hours spent per day" FontWeight="SemiBold" />
+                        <Grid x:Name="HoursChart" Height="200" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Style="{StaticResource CardBorderStyle}">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Last 8 weeks: tasks completed and hours spent" FontWeight="SemiBold" />
+                        <Grid x:Name="TrendChart" Height="180" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="By list and tag" FontWeight="SemiBold" />
+                        <Grid x:Name="Breakdown" RowSpacing="6" ColumnSpacing="12" />
+                        <TextBlock Text="A task with several tags counts once under each tag." Style="{StaticResource SecondaryTextStyle}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

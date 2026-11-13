@@ -1,0 +1,38 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:MyTodo.App.ViewModels">
+
+    <DataTemplate x:Key="TaskHeaderTemplate">
+        <TextBlock Text="{Binding HeaderText}" FontSize="13" FontWeight="SemiBold" Margin="2,14,0,4"
+                   Foreground="{ThemeResource Text2Brush}" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="TaskItemTemplate">
+        <Grid Padding="4,10" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding ToggleCommand}" Width="22" Height="22" Padding="0" CornerRadius="11" MinWidth="0" MinHeight="0"
+                    BorderThickness="2" BorderBrush="{Binding RingBrush}" Background="{Binding RingFill}" VerticalAlignment="Top" Margin="0,1,0,0"
+                    AutomationProperties.Name="{Binding CompleteLabel}">
+                <FontIcon Glyph="&#xE73E;" FontSize="10" Foreground="{ThemeResource OnAccentBrush}" Visibility="{Binding CheckVisibility}" />
+            </Button>
+            <StackPanel Grid.Column="1" Spacing="3">
+                <TextBlock Text="{Binding Title}" FontWeight="Medium" TextWrapping="Wrap" Foreground="{Binding TitleBrush}"
+                           TextDecorations="{Binding TitleDecorations}" />
+                <TextBlock Text="{Binding Meta}" FontSize="12" Foreground="{Binding MetaBrush}" TextWrapping="Wrap" />
+            </StackPanel>
+            <FontIcon Grid.Column="2" Glyph="&#xE916;" FontSize="14" Foreground="{ThemeResource BrandAccentBrush}"
+                      Visibility="{Binding TimerVisibility}" ToolTipService.ToolTip="Timer running" />
+            <TextBlock Grid.Column="3" Text="{Binding PriorityText}" FontSize="12" FontWeight="SemiBold" Foreground="{Binding PriorityBrush}" />
+        </Grid>
+    </DataTemplate>
+
+    <vm:TaskRowTemplateSelector x:Key="TaskRowSelector"
+                                HeaderTemplate="{StaticResource TaskHeaderTemplate}"
+                                TaskTemplate="{StaticResource TaskItemTemplate}" />
+</ResourceDictionary>

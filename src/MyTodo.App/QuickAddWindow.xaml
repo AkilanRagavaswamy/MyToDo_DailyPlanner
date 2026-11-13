@@ -1,0 +1,32 @@
+<Window
+    x:Class="MyTodo.App.QuickAddWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Quick add">
+    <Grid x:Name="Root" Padding="16" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBox x:Name="Input" FontSize="15" PlaceholderText="Prepare sprint demo fri 10am p2 #work"
+                 AutomationProperties.Name="New task" TextChanged="Input_TextChanged" KeyDown="Input_KeyDown" />
+        <ItemsControl x:Name="Chips" Grid.Row="1">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="6" /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <Border Background="{ThemeResource AccentSoftBrush}" CornerRadius="12" Padding="10,3">
+                        <TextBlock Text="{x:Bind}" FontSize="12" Foreground="{ThemeResource BrandAccentBrush}" />
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Grid Grid.Row="2">
+            <TextBlock VerticalAlignment="Center" Style="{StaticResource SecondaryTextStyle}"
+                       Text="Enter save · Ctrl+Enter save and open · Esc close" />
+            <Button HorizontalAlignment="Right" Style="{StaticResource AccentButtonStyle}" Content="Add task" Click="Add_Click" />
+        </Grid>
+    </Grid>
+</Window>

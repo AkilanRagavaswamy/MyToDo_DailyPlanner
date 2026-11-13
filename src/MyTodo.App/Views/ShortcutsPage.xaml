@@ -1,0 +1,14 @@
+<Page
+    x:Class="MyTodo.App.Views.ShortcutsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer>
+        <StackPanel Padding="28,20" Spacing="16">
+            <StackPanel>
+                <TextBlock Text="Keyboard shortcuts" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="Press Ctrl + / anywhere in the app to open this page." Foreground="{ThemeResource Text2Brush}" />
+            </StackPanel>
+            <VariableSizedWrapGrid x:Name="Groups" Orientation="Horizontal" ItemWidth="380" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>
