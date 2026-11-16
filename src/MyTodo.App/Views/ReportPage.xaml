@@ -27,16 +27,16 @@
                 <StackPanel Spacing="2">
                     <!-- The filter is the heading. A rail down the side cost a fifth of the width to say
                          the same thing, and the counts fit in the menu just as well. -->
-                    <DropDownButton x:Name="FilterButton" HorizontalAlignment="Left" Padding="10,2" Background="Transparent"
-                                    BorderThickness="0" AutomationProperties.Name="Choose a report">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock x:Name="TitleText" Text="Report" Style="{StaticResource PageTitleStyle}" />
-                            <FontIcon Glyph="&#xE70D;" FontSize="13" VerticalAlignment="Center" Margin="0,6,0,0" />
-                        </StackPanel>
-                        <DropDownButton.Flyout>
+                    <Button x:Name="FilterButton" HorizontalAlignment="Left" Padding="10,2" Background="Transparent"
+                            BorderThickness="0" AutomationProperties.Name="Choose a report">
+                        <TextBlock Style="{StaticResource PageTitleStyle}">
+                            <Run x:Name="TitleRun" Text="Report" />
+                            <Run FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18" Text="&#xE70D;" />
+                        </TextBlock>
+                        <Button.Flyout>
                             <MenuFlyout x:Name="FilterMenu" Placement="BottomEdgeAlignedLeft" />
-                        </DropDownButton.Flyout>
-                    </DropDownButton>
+                        </Button.Flyout>
+                    </Button>
                     <TextBlock x:Name="SubtitleText" Margin="10,0,0,0" Style="{StaticResource SecondaryTextStyle}" />
                 </StackPanel>
                 <DropDownButton x:Name="TagButton" Grid.Column="1" VerticalAlignment="Center" MinWidth="130"

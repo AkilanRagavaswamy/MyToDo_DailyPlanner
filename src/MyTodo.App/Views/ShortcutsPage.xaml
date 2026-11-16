@@ -8,7 +8,9 @@
                 <TextBlock Text="Keyboard shortcuts" Style="{StaticResource PageTitleStyle}" />
                 <TextBlock Text="Press Ctrl + / anywhere in the app to open this page." Foreground="{ThemeResource Text2Brush}" />
             </StackPanel>
-            <VariableSizedWrapGrid x:Name="Groups" Orientation="Horizontal" ItemWidth="380" />
+            <!-- Columns are laid out in code: a VariableSizedWrapGrid gives every cell the height of the
+                 first one, which clipped every card longer than the shortest. -->
+            <Grid x:Name="Groups" ColumnSpacing="14" RowSpacing="14" SizeChanged="Groups_SizeChanged" />
         </StackPanel>
     </ScrollViewer>
 </Page>

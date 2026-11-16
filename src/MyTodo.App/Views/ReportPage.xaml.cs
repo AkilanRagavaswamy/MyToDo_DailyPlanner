@@ -137,7 +137,7 @@ public sealed partial class ReportPage : Page, INewTaskTarget, IThemeAware
         BuildFilterMenu();
 
         var current = _filters.First(f => f.Key == _view);
-        TitleText.Text = current.Name;
+        TitleRun.Text = current.Name;
         SubtitleText.Text = current.Subtitle;
 
         var items = For(_view);

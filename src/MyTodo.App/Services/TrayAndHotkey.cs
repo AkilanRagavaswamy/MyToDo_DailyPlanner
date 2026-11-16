@@ -14,18 +14,28 @@ public sealed class TrayService : IDisposable
 
     public void Create(Action open, Action today, Action quickAdd, Action exit, string hotkey)
     {
+        // Rendered by Windows as a native popup menu, not as a XAML flyout. ContextMenuMode.SecondWindow
+        // draws the nicer WinUI menu, but H.NotifyIcon hosts it in a small window of its own and the
+        // menu is clipped to that window: the labels were cut off across, and the list was cut off
+        // below the third item. The library documents that mode as preview and untested, and offers no
+        // way to size the host. A native menu measures itself against the screen, so it cannot be
+        // clipped, and it scrolls by itself if it ever grows taller than the display.
         var menu = new MenuFlyout();
-        menu.Items.Add(new MenuFlyoutItem { Text = $"Quick add\t{hotkey}", Command = new RelayCommand(quickAdd) });
-        menu.Items.Add(new MenuFlyoutItem { Text = "Open My ToDo", Command = new RelayCommand(open) });
-        menu.Items.Add(new MenuFlyoutItem { Text = "Today", Command = new RelayCommand(today) });
+
+        // A native menu right-aligns whatever follows a tab, which is how the shortcut is shown.
+        MenuFlyoutItem Item(string text, Action run) => new() { Text = text, Command = new RelayCommand(run) };
+
+        menu.Items.Add(Item($"Quick add\t{hotkey}", quickAdd));
+        menu.Items.Add(Item("Open My ToDo", open));
+        menu.Items.Add(Item("Today", today));
         menu.Items.Add(new MenuFlyoutSeparator());
-        menu.Items.Add(new MenuFlyoutItem { Text = "Exit", Command = new RelayCommand(exit) });
+        menu.Items.Add(Item("Exit", exit));
 
         _icon = new TaskbarIcon
         {
             ToolTipText = "My ToDo : Daily Planner",
             IconSource = new BitmapImage(new Uri("ms-appx:///Assets/TrayIcon.ico")),
-            ContextMenuMode = ContextMenuMode.SecondWindow,
+            ContextMenuMode = ContextMenuMode.PopupMenu,
             ContextFlyout = menu,
             LeftClickCommand = new RelayCommand(open),
             NoLeftClickDelay = true
