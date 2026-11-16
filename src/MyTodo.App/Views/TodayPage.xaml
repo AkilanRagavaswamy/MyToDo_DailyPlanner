@@ -23,9 +23,10 @@
                     <TextBlock Text="Today" Style="{StaticResource PageTitleStyle}" />
                     <TextBlock x:Name="DateText" Foreground="{ThemeResource Text2Brush}" />
                 </StackPanel>
-                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="170" Spacing="6">
-                    <TextBlock x:Name="ProgressText" FontSize="12" Foreground="{ThemeResource Text2Brush}" />
-                    <ProgressBar x:Name="Progress" Maximum="1" />
+                <StackPanel x:Name="ProgressPanel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="170" Spacing="6">
+                    <TextBlock x:Name="ProgressText" FontSize="12" HorizontalAlignment="Right" Foreground="{ThemeResource Text2Brush}" />
+                    <ProgressBar x:Name="Progress" Maximum="1" Height="4" Padding="0" CornerRadius="2"
+                                 Background="{ThemeResource Surface2Brush}" Foreground="{ThemeResource BrandAccentFillBrush}" />
                 </StackPanel>
             </Grid>
 
@@ -59,7 +60,7 @@
             <StackPanel x:Name="EmptyState" Grid.Row="4" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
                 <FontIcon Glyph="&#xE73E;" FontSize="28" Foreground="{ThemeResource BrandAccentBrush}" />
                 <TextBlock Text="No tasks for today" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                <TextBlock Text="Press Ctrl+N, or Win+Shift+T from any app, to plan your day." Style="{StaticResource SecondaryTextStyle}" HorizontalAlignment="Center" />
+                <TextBlock x:Name="EmptyHint" Style="{StaticResource SecondaryTextStyle}" HorizontalAlignment="Center" />
             </StackPanel>
         </Grid>
 

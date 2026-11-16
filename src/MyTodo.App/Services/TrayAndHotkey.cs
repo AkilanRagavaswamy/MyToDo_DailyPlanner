@@ -12,18 +12,18 @@ public sealed class TrayService : IDisposable
 {
     private TaskbarIcon? _icon;
 
-    public void Create(Action open, Action today, Action quickAdd, Action exit)
+    public void Create(Action open, Action today, Action quickAdd, Action exit, string hotkey)
     {
         var menu = new MenuFlyout();
-        menu.Items.Add(new MenuFlyoutItem { Text = "Quick add\tWin+Shift+T", Command = new RelayCommand(quickAdd) });
-        menu.Items.Add(new MenuFlyoutItem { Text = "Open My To-Do", Command = new RelayCommand(open) });
+        menu.Items.Add(new MenuFlyoutItem { Text = $"Quick add\t{hotkey}", Command = new RelayCommand(quickAdd) });
+        menu.Items.Add(new MenuFlyoutItem { Text = "Open My ToDo", Command = new RelayCommand(open) });
         menu.Items.Add(new MenuFlyoutItem { Text = "Today", Command = new RelayCommand(today) });
         menu.Items.Add(new MenuFlyoutSeparator());
         menu.Items.Add(new MenuFlyoutItem { Text = "Exit", Command = new RelayCommand(exit) });
 
         _icon = new TaskbarIcon
         {
-            ToolTipText = "My To-Do : Daily Planner",
+            ToolTipText = "My ToDo : Daily Planner",
             IconSource = new BitmapImage(new Uri("ms-appx:///Assets/TrayIcon.ico")),
             ContextMenuMode = ContextMenuMode.SecondWindow,
             ContextFlyout = menu,
@@ -58,7 +58,7 @@ public sealed class HotkeyService : IDisposable
         Win32.SetWindowSubclass(hwnd, _proc, 1, IntPtr.Zero);
     }
 
-    /// <summary>Registers "Win+Shift+T" style combinations. Returns false when another app or Windows owns it.</summary>
+    /// <summary>Registers "Ctrl+Alt+T" style combinations. Returns false when another app or Windows owns it.</summary>
     public bool Register(string combo)
     {
         Unregister();

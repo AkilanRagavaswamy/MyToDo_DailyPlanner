@@ -19,7 +19,7 @@ public sealed partial class DataStore
     public DataStore(Database db)
     {
         _db = db;
-        EnsureInbox();
+        SyncTagsFromTasks();
     }
 
     public Database Database => _db;
@@ -54,38 +54,34 @@ public sealed partial class DataStore
 
     // ---------------- Lists ----------------
 
-    private void EnsureInbox()
-    {
-        if (Convert.ToInt32(_db.Scalar("SELECT COUNT(*) FROM lists WHERE is_inbox = 1 AND deleted = 0;")) > 0) return;
-        SaveList(new TodoList { Name = "Inbox", Color = "#7C8A82", IsInbox = true, SortOrder = 0 });
-        SaveList(new TodoList { Name = "Work", Color = "#1F8A5B", SortOrder = 1 });
-        SaveList(new TodoList { Name = "Personal", Color = "#F4A62A", SortOrder = 2 });
-    }
-
     public List<TodoList> GetLists() =>
-        _db.Query("SELECT * FROM lists WHERE deleted = 0 ORDER BY is_inbox DESC, sort_order, name;", MapList);
+        _db.Query("SELECT * FROM lists WHERE deleted = 0 ORDER BY sort_order, name;", MapList);
 
-    public TodoList Inbox() => GetLists().First(l => l.IsInbox);
+    /// <summary>The list new tasks fall into when none is named. There is no built-in Inbox: the user
+    /// creates the first list during first run, and the last remaining list cannot be deleted.</summary>
+    public TodoList? DefaultList() => GetLists().FirstOrDefault();
 
     private static TodoList MapList(SqliteDataReader r) => new()
     {
-        Id = r.G("id"), Name = r.S("name"), Color = r.S("color"), SortOrder = r.I("sort_order"), IsInbox = r.B("is_inbox"),
+        Id = r.G("id"), Name = r.S("name"), Color = r.S("color"), SortOrder = r.I("sort_order"),
         CreatedUtc = r.D("created"), UpdatedUtc = r.D("updated"), Deleted = r.B("deleted"), Version = r.I("version")
     };
 
     public void SaveList(TodoList l)
     {
-        _db.InTransaction((c, tx) => Upsert(c, tx, "lists", l, "name, color, sort_order, is_inbox", "$name, $color, $sort, $inbox",
-            "name=excluded.name, color=excluded.color, sort_order=excluded.sort_order, is_inbox=excluded.is_inbox",
-            ("$name", l.Name), ("$color", l.Color), ("$sort", l.SortOrder), ("$inbox", l.IsInbox ? 1 : 0)));
+        _db.InTransaction((c, tx) => Upsert(c, tx, "lists", l, "name, color, sort_order", "$name, $color, $sort",
+            "name=excluded.name, color=excluded.color, sort_order=excluded.sort_order",
+            ("$name", l.Name), ("$color", l.Color), ("$sort", l.SortOrder)));
         Raise("lists");
     }
 
-    /// <summary>Deletes a list and its tasks (soft delete; tombstones kept for 1.1.0.0 sync).</summary>
+    /// <summary>Deletes a list and its tasks (soft delete; tombstones kept for 1.1.0.0 sync).
+    /// The last remaining list is kept: tasks always need somewhere to live.</summary>
     public void DeleteList(Guid id)
     {
-        var list = GetLists().FirstOrDefault(l => l.Id == id);
-        if (list == null || list.IsInbox) return;
+        var all = GetLists();
+        var list = all.FirstOrDefault(l => l.Id == id);
+        if (list == null || all.Count <= 1) return;
         foreach (var t in GetTasksInList(id)) { t.Deleted = true; SaveTask(t, raise: false); }
         list.Deleted = true;
         SaveList(list);

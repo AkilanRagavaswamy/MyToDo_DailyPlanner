@@ -43,12 +43,13 @@ public sealed class AppSettings
     public bool LaunchAtStartup { get; set; } = true;
     public bool StartMinimized { get; set; } = true;
     public bool CloseToTray { get; set; } = true;
-    /// <summary>"Win+Shift+T" (default) or "Ctrl+Alt+T", "Ctrl+Shift+Space".</summary>
-    public string QuickAddHotkey { get; set; } = "Win+Shift+T";
+    /// <summary>Default "Ctrl+Alt+T". Win+ combinations are avoided: Windows already owns most of them
+    /// (Win+T and Win+Shift+T cycle the taskbar buttons), so they never reach the app.</summary>
+    public string QuickAddHotkey { get; set; } = "Ctrl+Alt+T";
 
     // Internal bookkeeping
     public DateTime? LastTickUtc { get; set; }
     public DateTime? LastArchiveRunUtc { get; set; }
 
-    public static readonly string[] HotkeyChoices = { "Win+Shift+T", "Ctrl+Alt+T", "Ctrl+Shift+Space" };
+    public static readonly string[] HotkeyChoices = { "Ctrl+Alt+T", "Ctrl+Alt+N", "Ctrl+Shift+Space" };
 }

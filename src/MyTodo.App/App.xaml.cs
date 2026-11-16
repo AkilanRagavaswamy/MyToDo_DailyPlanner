@@ -32,8 +32,14 @@ public partial class App : Application
         Instance = this;
         InitializeComponent();
         UnhandledException += (_, e) => { Log.Error("Unhandled", e.Exception); e.Handled = true; };
+        // A failure off the UI thread bypasses the handler above and kills the process with nothing
+        // written down. This is the only record of one, so it is worth the two lines.
+        AppDomain.CurrentDomain.UnhandledException += (_, e) => Log.Error("Unhandled (background thread)", e.ExceptionObject as Exception);
 
-        _services = new AppServices(DispatcherQueue.GetForCurrentThread());
+        // Opening and migrating the database is the first thing that can fail, and it happens before
+        // there is a window to put an error in; without this the app would just vanish.
+        try { _services = new AppServices(DispatcherQueue.GetForCurrentThread()); }
+        catch (Exception ex) { Log.Error("Startup failed while opening the database", ex); throw; }
         var s = _services.Settings;
         if (s.Theme == ThemeChoice.Light) RequestedTheme = ApplicationTheme.Light;
         else if (s.Theme == ThemeChoice.Dark) RequestedTheme = ApplicationTheme.Dark;
@@ -48,7 +54,7 @@ public partial class App : Application
         services.Reminders.RegisterActivation();
         services.Reminders.OpenRequested += (kind, id) => ShowMainWindow(kind switch
         {
-            "task" => new NavRequest(typeof(ListsPage), id),
+            "task" => new NavRequest(typeof(BoardPage), id),
             "event" => new NavRequest(typeof(CalendarPage), id),
             _ => new NavRequest(typeof(TodayPage), null)
         });
@@ -57,7 +63,8 @@ public partial class App : Application
             open: () => ShowMainWindow(),
             today: () => ShowMainWindow(new NavRequest(typeof(TodayPage), null)),
             quickAdd: ShowQuickAdd,
-            exit: Exit);
+            exit: Exit,
+            hotkey: services.Settings.QuickAddHotkey);
 
         _ = JumpListService.UpdateAsync();
         RunDailyHousekeeping();

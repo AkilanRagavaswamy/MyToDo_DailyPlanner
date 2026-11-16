@@ -196,8 +196,8 @@ public sealed partial class SettingsPage : Page
 
         var data = Section("Your data");
         var exports = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        exports.Children.Add(ActionButton("Export JSON", () => SaveTextAsync("My To-Do export", ".json", "JSON", _s.Store.ExportJson())));
-        exports.Children.Add(ActionButton("Export calendar (.ics)", () => SaveTextAsync("My To-Do calendar", ".ics", "iCalendar", IcsWriter.Write(_s.Store.GetAllEvents()))));
+        exports.Children.Add(ActionButton("Export JSON", () => SaveTextAsync("My ToDo export", ".json", "JSON", _s.Store.ExportJson())));
+        exports.Children.Add(ActionButton("Export calendar (.ics)", () => SaveTextAsync("My ToDo calendar", ".ics", "iCalendar", IcsWriter.Write(_s.Store.GetAllEvents()))));
         Row(data, "Export", "All data as JSON, calendar as .ics. Backup and restore arrive in 1.1.0.0.", exports);
 
         var about = Section("About");

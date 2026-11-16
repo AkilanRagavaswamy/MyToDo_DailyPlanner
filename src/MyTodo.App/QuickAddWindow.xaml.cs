@@ -24,19 +24,45 @@ public sealed partial class QuickAddWindow : Window
     public QuickAddWindow()
     {
         InitializeComponent();
-        AppWindow.Resize(new SizeInt32(560, 170));
         if (AppWindow.Presenter is OverlappedPresenter p)
         {
+            // Spotlight-style popup: no title bar, dismissed with Esc or by losing focus. The border stays
+            // so Windows still draws the drop shadow and rounds the frame.
+            p.SetBorderAndTitleBar(true, false);
             p.IsAlwaysOnTop = true;
             p.IsResizable = false;
             p.IsMaximizable = false;
             p.IsMinimizable = false;
         }
+        AppWindow.IsShownInSwitchers = false;
+        RoundCorners();
+        SizeToContent();
         if (MicaController.IsSupported()) SystemBackdrop = new MicaBackdrop { Kind = MicaKind.BaseAlt };
         else Root.Background = Ui.Brush("SurfaceBrush");
         ThemeService.Apply(Root, _s.Settings.Theme);
+        Root.Loaded += (_, _) => { SizeToContent(); CenterOnScreen(); };
         Activated += (_, e) => { if (e.WindowActivationState == WindowActivationState.Deactivated && Input.Text.Length == 0) Close(); };
         CenterOnScreen();
+    }
+
+    // Design size in DIPs. AppWindow works in physical pixels while XAML lays out in DIPs, so without
+    // scaling by the window DPI a 150% display gives the content only two-thirds the room and it clips.
+    private const int WidthDip = 580, HeightDip = 150;
+
+    private void RoundCorners()
+    {
+        var pref = Win32.DWMWCP_ROUND;
+        Win32.DwmSetWindowAttribute(WindowNative.GetWindowHandle(this), Win32.DWMWA_WINDOW_CORNER_PREFERENCE, ref pref, sizeof(int));
+    }
+
+    private void SizeToContent()
+    {
+        var scale = Win32.GetDpiForWindow(WindowNative.GetWindowHandle(this)) / 96.0;
+        // Measure the real content so the gap below the footer matches the 15px padding on the other three
+        // sides; HeightDip is only the fallback for the first call, before the tree has loaded.
+        Root.Measure(new Windows.Foundation.Size(WidthDip, double.PositiveInfinity));
+        var height = Root.DesiredSize.Height > 0 ? Math.Ceiling(Root.DesiredSize.Height) : HeightDip;
+        AppWindow.ResizeClient(new SizeInt32((int)Math.Round(WidthDip * scale), (int)Math.Round(height * scale)));
     }
 
     private void CenterOnScreen()
@@ -60,7 +86,7 @@ public sealed partial class QuickAddWindow : Window
         if (Input.Text.Trim().Length == 0) { Chips.ItemsSource = null; return; }
         var parsed = Parse();
         var chips = parsed.PreviewChips().ToList();
-        if (parsed.ListName == null) chips.Add("List: Inbox");
+        if (parsed.ListName == null && _s.Store.DefaultList() is { } fallback) chips.Add("List: " + fallback.Name);
         if (parsed.Date != null)
             chips.Add(parsed.Time != null ? "Reminders 1 h, 30 min, 15 min" : "Reminders 3 PM day before, 9 AM");
         Chips.ItemsSource = chips;
@@ -84,7 +110,7 @@ public sealed partial class QuickAddWindow : Window
         if (Input.Text.Trim().Length == 0) return;
         var task = TaskCreator.CreateFromText(_s, Input.Text);
         Close();
-        if (openAfter) App.Instance!.ShowMainWindow(new NavRequest(typeof(ListsPage), "task:" + task.Id));
+        if (openAfter) App.Instance!.ShowMainWindow(new NavRequest(typeof(BoardPage), "task:" + task.Id));
     }
 }
 
@@ -100,7 +126,7 @@ public static class TaskCreator
         var task = new TodoTask
         {
             Title = parsed.Title,
-            ListId = list?.Id ?? listId ?? lists.First(l => l.IsInbox).Id,
+            ListId = list?.Id ?? listId ?? lists[0].Id,
             Priority = parsed.Priority,
             DueUtc = parsed.DueUtc(),
             DueHasTime = parsed.Time != null,

@@ -1,0 +1,178 @@
+<Page
+    x:Class="MyTodo.App.Views.BoardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MyTodo.App.Views">
+
+    <Page.Resources>
+        <!-- One board column. The four ContentControls below share it, so the drag handlers are written
+             once; each column's view model carries the stage a drop into it means. -->
+        <DataTemplate x:Key="BoardColumnTemplate">
+            <Border Background="{ThemeResource Surface2Brush}" BorderBrush="{ThemeResource LineBrush}" BorderThickness="1"
+                    CornerRadius="10" Padding="0"
+                    AllowDrop="True" DragOver="Column_DragOver" Drop="Column_Drop">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid Padding="14,12,14,8" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Width="9" Height="9" VerticalAlignment="Center" Fill="{Binding AccentBrush}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                   TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        <Border Grid.Column="2" Background="{ThemeResource SurfaceBrush}" CornerRadius="9" Padding="7,1">
+                            <TextBlock Text="{Binding CountText}" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{ThemeResource Text2Brush}" />
+                        </Border>
+                    </Grid>
+                    <ListView Grid.Row="1" ItemsSource="{Binding Rows}" Padding="10,0,10,10"
+                              SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Card_Click"
+                              ItemTemplate="{StaticResource BoardCardTemplate}"
+                              CanDragItems="True" AllowDrop="True" CanReorderItems="False"
+                              DragItemsStarting="Card_DragItemsStarting" DragOver="Column_DragOver" Drop="Column_Drop"
+                              AutomationProperties.Name="{Binding Name}">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="MinHeight" Value="0" />
+                                <Setter Property="Background" Value="Transparent" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+                    <TextBlock Grid.Row="1" Text="{Binding EmptyText}" Visibility="{Binding EmptyVisibility}"
+                               Margin="14,8,14,0" VerticalAlignment="Top" IsHitTestVisible="False"
+                               Style="{StaticResource SecondaryTextStyle}" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!-- A row in the list view. SwipeControl carries the stage actions; the items themselves are
+             built per task in code, because a SwipeItem has no DataContext of its own to bind to. -->
+        <DataTemplate x:Key="SwipeTaskTemplate">
+            <SwipeControl DataContextChanged="Swipe_DataContextChanged" HorizontalContentAlignment="Stretch">
+                <ContentControl ContentTemplateSelector="{StaticResource TaskRowPlainSelector}" Content="{Binding}"
+                                HorizontalContentAlignment="Stretch" IsTabStop="False" />
+            </SwipeControl>
+        </DataTemplate>
+    </Page.Resources>
+
+    <SplitView x:Name="DetailSplit" PanePlacement="Right" DisplayMode="Overlay" OpenPaneLength="440"
+               IsPaneOpen="False" PaneClosed="Detail_PaneClosed" LightDismissOverlayMode="On">
+        <SplitView.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Escape" Invoked="Escape_Invoked" />
+        </SplitView.KeyboardAccelerators>
+        <SplitView.Pane>
+            <local:TaskDetailPanel x:Name="Detail" />
+        </SplitView.Pane>
+
+        <Grid Padding="28,20,28,20" RowSpacing="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Spacing="2">
+                    <TextBlock x:Name="TitleText" Text="Board" Style="{StaticResource PageTitleStyle}" />
+                    <TextBlock x:Name="SubtitleText" Style="{StaticResource SecondaryTextStyle}" />
+                </StackPanel>
+                <DropDownButton x:Name="ListButton" Grid.Column="1" VerticalAlignment="Center" MinWidth="150"
+                                HorizontalContentAlignment="Left" AutomationProperties.Name="Filter by list">
+                    <TextBlock x:Name="ListLabel" Text="All lists" TextTrimming="CharacterEllipsis" />
+                    <DropDownButton.Flyout>
+                        <MenuFlyout x:Name="ListMenu" Placement="BottomEdgeAlignedLeft" />
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+                <DropDownButton x:Name="TagButton" Grid.Column="2" VerticalAlignment="Center" MinWidth="130"
+                                HorizontalContentAlignment="Left" AutomationProperties.Name="Filter by tag">
+                    <TextBlock x:Name="TagLabel" Text="All tags" TextTrimming="CharacterEllipsis" />
+                    <DropDownButton.Flyout>
+                        <MenuFlyout x:Name="TagMenu" Placement="BottomEdgeAlignedLeft" />
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+
+                <!-- Board / List toggle. Two ToggleButtons rather than a segmented control: the pair is
+                     kept mutually exclusive in code, so neither can end up unselected. -->
+                <Border Grid.Column="3" VerticalAlignment="Center" CornerRadius="6" Padding="2"
+                        Background="{ThemeResource Surface2Brush}" BorderBrush="{ThemeResource LineBrush}" BorderThickness="1">
+                    <StackPanel Orientation="Horizontal" Spacing="2">
+                        <ToggleButton x:Name="BoardToggle" IsChecked="True" Click="View_Click" Padding="10,4" MinWidth="0"
+                                      BorderThickness="0" AutomationProperties.Name="Board view" ToolTipService.ToolTip="Board view">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon Glyph="&#xE8A9;" FontSize="13" />
+                                <TextBlock Text="Board" FontSize="12" />
+                            </StackPanel>
+                        </ToggleButton>
+                        <ToggleButton x:Name="ListToggle" Click="View_Click" Padding="10,4" MinWidth="0"
+                                      BorderThickness="0" AutomationProperties.Name="List view" ToolTipService.ToolTip="List view">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon Glyph="&#xE8FD;" FontSize="13" />
+                                <TextBlock Text="List" FontSize="12" />
+                            </StackPanel>
+                        </ToggleButton>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <InfoBar x:Name="UndoBar" Grid.Row="1" IsOpen="False" Severity="Informational" />
+
+            <Grid x:Name="BoardHost" Grid.Row="2" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ContentControl x:Name="Col0" Grid.Column="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                ContentTemplate="{StaticResource BoardColumnTemplate}" />
+                <ContentControl x:Name="Col1" Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                ContentTemplate="{StaticResource BoardColumnTemplate}" />
+                <ContentControl x:Name="Col2" Grid.Column="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                ContentTemplate="{StaticResource BoardColumnTemplate}" />
+                <ContentControl x:Name="Col3" Grid.Column="3" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                ContentTemplate="{StaticResource BoardColumnTemplate}" />
+            </Grid>
+
+            <Grid x:Name="ListHost" Grid.Row="2" Visibility="Collapsed" RowSpacing="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBox x:Name="AddBox" PlaceholderText="Add a task (Ctrl+N)" KeyDown="AddBox_KeyDown"
+                         AutomationProperties.Name="Add a task" />
+                <Grid Grid.Row="1">
+                    <ListView x:Name="TaskList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="TaskList_ItemClick"
+                              ItemTemplate="{StaticResource SwipeTaskTemplate}" RightTapped="TaskList_RightTapped"
+                              Padding="0,0,0,24" AutomationProperties.Name="Tasks">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="MinHeight" Value="0" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="Delete" Invoked="DeleteKey_Invoked" />
+                            <KeyboardAccelerator Key="Enter" Modifiers="Control" Invoked="CompleteKey_Invoked" />
+                        </ListView.KeyboardAccelerators>
+                    </ListView>
+                    <TextBlock x:Name="EmptyText" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               TextAlignment="Center" MaxWidth="360" Style="{StaticResource SecondaryTextStyle}" />
+                </Grid>
+            </Grid>
+        </Grid>
+    </SplitView>
+</Page>

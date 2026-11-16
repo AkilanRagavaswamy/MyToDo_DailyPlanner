@@ -54,6 +54,9 @@ public sealed class TimerService
         _tick = app.Dispatcher.CreateTimer();
         _tick.Interval = TimeSpan.FromSeconds(1);
         _tick.Tick += (_, _) => Tick?.Invoke();
+        // Start / Hold / Complete open and close time entries inside the data layer, so follow the table
+        // rather than expecting every caller to remember to refresh afterwards.
+        app.Store.Changed += table => { if (table == "time_entries") app.Dispatcher.TryEnqueue(Refresh); };
         Refresh();
     }
 

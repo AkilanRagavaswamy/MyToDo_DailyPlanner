@@ -16,7 +16,9 @@
                           AutomationProperties.Name="Completed (Ctrl+Enter)" />
                 <TextBox x:Name="TitleBox" Grid.Column="1" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" AcceptsReturn="False"
                          BorderThickness="0" Background="Transparent" LostFocus="Field_LostFocus" AutomationProperties.Name="Task title" />
-                <Button Grid.Column="2" Click="Close_Click" Background="Transparent" BorderThickness="0" AutomationProperties.Name="Close details">
+                <Button Grid.Column="2" Click="Close_Click" Width="32" Height="32" Padding="0" MinWidth="0" MinHeight="0"
+                        CornerRadius="16" VerticalAlignment="Top" Background="Transparent" BorderThickness="0"
+                        ToolTipService.ToolTip="Close (Esc)" AutomationProperties.Name="Close details">
                     <FontIcon Glyph="&#xE711;" FontSize="12" />
                 </Button>
             </Grid>
@@ -55,8 +57,15 @@
                 </ComboBox>
                 <TextBlock Grid.Row="3" Text="Repeat" VerticalAlignment="Center" Style="{StaticResource SecondaryTextStyle}" />
                 <ComboBox x:Name="RepeatCombo" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="Field_Changed" AutomationProperties.Name="Repeat" />
-                <TextBlock Grid.Row="4" Text="Tags" VerticalAlignment="Center" Style="{StaticResource SecondaryTextStyle}" />
-                <TextBox x:Name="TagsBox" Grid.Row="4" Grid.Column="1" PlaceholderText="#q4 #planning" LostFocus="Field_LostFocus" AutomationProperties.Name="Tags" />
+                <TextBlock Grid.Row="4" Text="Tags" VerticalAlignment="Top" Margin="0,6,0,0" Style="{StaticResource SecondaryTextStyle}" />
+                <StackPanel Grid.Row="4" Grid.Column="1" Spacing="6">
+                    <ItemsControl x:Name="TagChips">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate><VariableSizedWrapGrid Orientation="Horizontal" ItemHeight="30" ItemWidth="120" /></ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <DropDownButton x:Name="TagPicker" HorizontalAlignment="Left" Content="+ Tag" AutomationProperties.Name="Add a tag" />
+                </StackPanel>
                 <TextBlock Grid.Row="5" Text="Time blocks" VerticalAlignment="Top" Style="{StaticResource SecondaryTextStyle}" />
                 <TextBlock x:Name="BlocksText" Grid.Row="5" Grid.Column="1" TextWrapping="Wrap" FontSize="13" />
             </Grid>

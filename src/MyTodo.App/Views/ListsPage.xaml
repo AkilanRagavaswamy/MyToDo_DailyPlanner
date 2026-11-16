@@ -1,71 +1,82 @@
 <Page
     x:Class="MyTodo.App.Views.ListsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:MyTodo.App.Views">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" MinWidth="420" />
-            <ColumnDefinition x:Name="DetailColumn" Width="0" />
-        </Grid.ColumnDefinitions>
-
-        <Grid Padding="28,20,28,0" RowSpacing="12">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid ColumnSpacing="10">
+    <Page.Resources>
+        <DataTemplate x:Key="ListCardTemplate">
+            <Grid Padding="16,14" ColumnSpacing="14">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Ellipse x:Name="ListDot" Width="12" Height="12" VerticalAlignment="Center" />
-                <TextBlock x:Name="TitleText" Grid.Column="1" Style="{StaticResource PageTitleStyle}" TextTrimming="CharacterEllipsis" />
-                <ComboBox x:Name="SortCombo" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="Options_Changed" AutomationProperties.Name="Sort">
-                    <x:String>Sort: Due date</x:String>
-                    <x:String>Sort: Priority</x:String>
-                    <x:String>Sort: Manual</x:String>
-                </ComboBox>
-                <ComboBox x:Name="TagCombo" Grid.Column="3" VerticalAlignment="Center" SelectionChanged="Options_Changed" AutomationProperties.Name="Filter by tag" />
-                <DropDownButton x:Name="ListMenuButton" Grid.Column="4" VerticalAlignment="Center" AutomationProperties.Name="List options">
+                <Border Width="34" Height="34" CornerRadius="17" Background="{Binding SoftBrush}" VerticalAlignment="Center">
+                    <Ellipse Width="12" Height="12" Fill="{Binding ColorBrush}" />
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding CountText}" Style="{StaticResource SecondaryTextStyle}" />
+                </StackPanel>
+                <Button Grid.Column="2" Content="Open" Click="Open_Click" Tag="{Binding Id}" VerticalAlignment="Center"
+                        AutomationProperties.Name="{Binding OpenLabel}" />
+                <Button Grid.Column="3" VerticalAlignment="Center" Background="Transparent" BorderThickness="0"
+                        AutomationProperties.Name="{Binding MenuLabel}" ToolTipService.ToolTip="List options">
                     <FontIcon Glyph="&#xE712;" FontSize="14" />
-                    <DropDownButton.Flyout>
+                    <Button.Flyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem Text="Rename list" Click="RenameList_Click" />
-                            <MenuFlyoutItem Text="Delete list" Click="DeleteList_Click" />
+                            <MenuFlyoutItem Text="Edit" Icon="Edit" Click="Edit_Click" Tag="{Binding Id}" />
+                            <MenuFlyoutItem Text="Delete" Icon="Delete" Click="Delete_Click" Tag="{Binding Id}" />
                         </MenuFlyout>
-                    </DropDownButton.Flyout>
-                </DropDownButton>
+                    </Button.Flyout>
+                </Button>
             </Grid>
-            <TextBox x:Name="AddBox" Grid.Row="1" PlaceholderText="Add a task to this list (Ctrl+N)" KeyDown="AddBox_KeyDown" AutomationProperties.Name="Add a task" />
-            <InfoBar x:Name="UndoBar" Grid.Row="2" IsOpen="False" Severity="Informational" />
-            <ListView x:Name="TaskList" Grid.Row="3" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="TaskList_ItemClick"
-                      ItemTemplateSelector="{StaticResource TaskRowSelector}" CanDragItems="True" DragItemsStarting="TaskList_DragItemsStarting"
-                      DragItemsCompleted="TaskList_DragItemsCompleted" RightTapped="TaskList_RightTapped" Padding="0,0,0,24"
-                      AutomationProperties.Name="Tasks">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.KeyboardAccelerators>
-                    <KeyboardAccelerator Key="Delete" Invoked="DeleteKey_Invoked" />
-                    <KeyboardAccelerator Key="Enter" Modifiers="Control" Invoked="CompleteKey_Invoked" />
-                    <KeyboardAccelerator Key="Up" Modifiers="Menu" Invoked="MoveUp_Invoked" />
-                    <KeyboardAccelerator Key="Down" Modifiers="Menu" Invoked="MoveDown_Invoked" />
-                </ListView.KeyboardAccelerators>
-            </ListView>
-            <TextBlock x:Name="EmptyText" Grid.Row="3" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource SecondaryTextStyle}" />
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Padding="28,20,28,20" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Spacing="2">
+                <TextBlock Text="Lists" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="Every list you have, and what is still open in it. Open a list to work on its tasks."
+                           Style="{StaticResource SecondaryTextStyle}" />
+            </StackPanel>
+            <Button x:Name="NewListButton" Grid.Column="1" Style="{StaticResource AccentButtonStyle}" VerticalAlignment="Center"
+                    Click="NewList_Click" AutomationProperties.Name="New list">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE710;" FontSize="14" />
+                    <TextBlock Text="New list" />
+                </StackPanel>
+            </Button>
         </Grid>
 
-        <Border x:Name="DetailHost" Grid.Column="1" BorderBrush="{ThemeResource LineBrush}" BorderThickness="1,0,0,0" Visibility="Collapsed">
-            <local:TaskDetailPanel x:Name="Detail" />
-        </Border>
+        <InfoBar x:Name="UndoBar" Grid.Row="1" IsOpen="False" Severity="Informational" />
+
+        <ListView x:Name="ListsView" Grid.Row="2" SelectionMode="None" IsItemClickEnabled="True" ItemClick="List_ItemClick"
+                  ItemTemplate="{StaticResource ListCardTemplate}" AutomationProperties.Name="Your lists">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0,0,0,8" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="Background" Value="{ThemeResource SurfaceBrush}" />
+                    <Setter Property="BorderBrush" Value="{ThemeResource LineBrush}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="8" />
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
     </Grid>
 </Page>

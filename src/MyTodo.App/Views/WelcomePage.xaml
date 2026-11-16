@@ -8,7 +8,7 @@
                 <StackPanel Orientation="Horizontal" Spacing="16">
                     <Image Source="ms-appx:///Assets/Square150x150Logo.png" Width="64" Height="64" />
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Welcome to My To-Do" FontSize="24" FontWeight="SemiBold" />
+                        <TextBlock Text="Welcome to My ToDo" FontSize="24" FontWeight="SemiBold" />
                         <TextBlock Text="Your tasks, calendar and diary, on this PC." Foreground="{ThemeResource Text2Brush}" />
                     </StackPanel>
                 </StackPanel>
@@ -20,12 +20,16 @@
                             <x:String>Dark</x:String>
                             <x:String>Use system setting</x:String>
                         </RadioButtons>
+                        <TextBox x:Name="ListNameBox" Header="Your first list" PlaceholderText="Work, Personal, Home…"
+                                 MaxLength="40" TextChanged="ListName_Changed" AutomationProperties.Name="Your first list" />
+                        <TextBlock Style="{StaticResource SecondaryTextStyle}"
+                                   Text="Tasks live in lists. Create one to get started — you can add more at any time." />
                         <ToggleSwitch x:Name="StartupToggle" Header="Launch at Windows startup" IsOn="True" />
                         <ToggleSwitch x:Name="SoundToggle" Header="Reminder sound (1 hour, 30 minutes and 15 minutes before)" IsOn="True" />
                     </StackPanel>
                 </Border>
                 <InfoBar x:Name="Notice" IsOpen="False" Severity="Warning" />
-                <Button Content="Start using My To-Do" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Stretch" Height="40" Click="Start_Click" />
+                <Button x:Name="StartButton" Content="Start using My ToDo" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Stretch" Height="40" IsEnabled="False" Click="Start_Click" />
             </StackPanel>
         </Border>
     </Grid>

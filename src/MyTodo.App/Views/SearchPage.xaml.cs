@@ -102,7 +102,7 @@ public sealed partial class SearchPage : Page
         var window = App.Instance!.MainWindow!;
         switch (r.Kind)
         {
-            case "task": case "file": window.Navigate(typeof(ListsPage), "task:" + r.Id); break;
+            case "task": case "file": window.Navigate(typeof(BoardPage), "task:" + r.Id); break;
             case "event": window.Navigate(typeof(CalendarPage), r.Id); break;
             case "diary":
                 var entry = _s.Store.GetAllDiary().FirstOrDefault(d => d.Id == r.Id);

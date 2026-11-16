@@ -151,7 +151,7 @@ public sealed partial class InsightsPage : Page, IThemeAware
     private async void Export_Click(object sender, RoutedEventArgs e)
     {
         if (_report == null) return;
-        var picker = new FileSavePicker { SuggestedFileName = $"My To-Do insights {_report.WeekStart:yyyy-MM-dd}" };
+        var picker = new FileSavePicker { SuggestedFileName = $"My ToDo insights {_report.WeekStart:yyyy-MM-dd}" };
         picker.FileTypeChoices.Add("CSV", new List<string> { ".csv" });
         WinRT.Interop.InitializeWithWindow.Initialize(picker, App.Instance!.MainWindow!.Hwnd);
         if (await picker.PickSaveFileAsync() is StorageFile file) await FileIO.WriteTextAsync(file, InsightsCalculator.ToCsv(_report));

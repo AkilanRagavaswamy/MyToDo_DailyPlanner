@@ -56,10 +56,11 @@ public sealed partial class MainWindow : Window
 
         BuildAccelerators();
         RebuildListsMenu();
-        _s.Store.Changed += t => { if (t == "lists") DispatcherQueue.TryEnqueue(RebuildListsMenu); };
+        _s.Store.Changed += t => { if (t is "lists" or "tasks") DispatcherQueue.TryEnqueue(RebuildListsMenu); };
         _s.Reminders.MissedRemindersFound += m => DispatcherQueue.TryEnqueue(() => ShowMissed(m));
 
-        if (!_s.Settings.FirstRunDone)
+        // No lists means first run has not finished: the user must create one before the app is usable.
+        if (!_s.Settings.FirstRunDone || _s.Store.GetLists().Count == 0)
         {
             Nav.IsPaneVisible = false;
             ContentFrame.Navigate(typeof(WelcomePage));
@@ -150,7 +151,10 @@ public sealed partial class MainWindow : Window
         ContentFrame.Navigate(page, parameter);
         _suppressNav = true;
         var tag = page == typeof(TodayPage) ? "today"
-            : page == typeof(ListsPage) ? (parameter is string sp ? sp : "lists")
+            : page == typeof(ListsPage) ? "lists"
+            : page == typeof(BoardPage) ? "board"
+            : page == typeof(ReportPage) ? "report"
+            : page == typeof(TagsPage) ? "tags"
             : page == typeof(CalendarPage) ? "calendar"
             : page == typeof(DiaryPage) ? "diary"
             : page == typeof(InsightsPage) ? "insights"
@@ -175,51 +179,27 @@ public sealed partial class MainWindow : Window
         switch (tag)
         {
             case "today": ContentFrame.Navigate(typeof(TodayPage)); break;
-            case "lists": ContentFrame.Navigate(typeof(ListsPage), "list:" + _s.Store.Inbox().Id); break;
+            case "lists": ContentFrame.Navigate(typeof(ListsPage)); break;
+            case "tags": ContentFrame.Navigate(typeof(TagsPage)); break;
+            case "board": ContentFrame.Navigate(typeof(BoardPage)); break;
+            case "report": ContentFrame.Navigate(typeof(ReportPage)); break;
             case "calendar": ContentFrame.Navigate(typeof(CalendarPage)); break;
             case "diary": ContentFrame.Navigate(typeof(DiaryPage)); break;
             case "insights": ContentFrame.Navigate(typeof(InsightsPage)); break;
             case "settings": ContentFrame.Navigate(typeof(SettingsPage)); break;
             case "shortcuts": ContentFrame.Navigate(typeof(ShortcutsPage)); break;
-            case "newlist": _ = CreateListAsync(); break;
             default:
-                if (tag.StartsWith("list:") || tag.StartsWith("view:")) ContentFrame.Navigate(typeof(ListsPage), tag);
+                if (tag.StartsWith("list:")) ContentFrame.Navigate(typeof(BoardPage), tag);
                 break;
         }
     }
 
-    /// <summary>Lists, smart views and "New list" under the Lists item (TSK-02, TSK-06).</summary>
+    /// <summary>The count of open tasks on the Board item. Lists are managed on the list master and the
+    /// cross-list views live on Report, so the rail no longer carries a tree of either (TSK-02, TSK-06).</summary>
     private void RebuildListsMenu()
     {
-        var selectedTag = (Nav.SelectedItem as NavigationViewItem)?.Tag as string;
-        ListsItem.MenuItems.Clear();
-        var open = _s.Store.GetAllTasks().Where(t => !t.IsCompleted && t.ParentId == null).ToList();
-        foreach (var l in _s.Store.GetLists())
-        {
-            var count = open.Count(t => t.ListId == l.Id);
-            ListsItem.MenuItems.Add(new NavigationViewItem
-            {
-                Content = l.Name, Tag = "list:" + l.Id,
-                Icon = new FontIcon { Glyph = "\uEA3B", Foreground = Ui.Hex(l.Color), FontSize = 10 },
-                InfoBadge = count > 0 ? new InfoBadge { Value = count, Opacity = 0.75 } : null
-            });
-        }
-        foreach (var (tag, label, glyph) in new[] { ("view:upcoming", "Upcoming", "\uE787"), ("view:overdue", "Overdue", "\uE7BA"), ("view:nodate", "No date", "\uE8C8"), ("view:completed", "Completed", "\uE73E"), ("view:archive", "Archive", "\uE7B8") })
-            ListsItem.MenuItems.Add(new NavigationViewItem { Content = label, Tag = tag, Icon = new FontIcon { Glyph = glyph } });
-        ListsItem.MenuItems.Add(new NavigationViewItem { Content = "New list", Tag = "newlist", SelectsOnInvoked = false, Icon = new FontIcon { Glyph = "\uE710" } });
-        if (selectedTag != null && FindItem(selectedTag) is { } again) { _suppressNav = true; Nav.SelectedItem = again; _suppressNav = false; }
-    }
-
-    private async Task CreateListAsync()
-    {
-        var box = new TextBox { PlaceholderText = "List name" };
-        var dialog = new ContentDialog { XamlRoot = Root.XamlRoot, Title = "New list", Content = box, PrimaryButtonText = "Create", CloseButtonText = "Cancel", DefaultButton = ContentDialogButton.Primary };
-        if (await dialog.ShowAsync() != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(box.Text)) return;
-        var colors = new[] { "#1F8A5B", "#4A7FD6", "#F4A62A", "#B45AC7", "#D9534F", "#2AA6A6" };
-        var lists = _s.Store.GetLists();
-        var list = new Core.Models.TodoList { Name = box.Text.Trim(), Color = colors[lists.Count % colors.Length], SortOrder = lists.Count };
-        _s.Store.SaveList(list);
-        ContentFrame.Navigate(typeof(ListsPage), "list:" + list.Id);
+        var open = _s.Store.GetAllTasks().Count(t => t.IsActive && t.ParentId == null);
+        BoardItem.InfoBadge = open > 0 ? new InfoBadge { Value = open, Opacity = 0.75 } : null;
     }
 
     private void NewTask_Click(object sender, RoutedEventArgs e) => App.Instance!.ShowQuickAdd();
@@ -252,10 +232,13 @@ public sealed partial class MainWindow : Window
         }
         const VirtualKeyModifiers C = VirtualKeyModifiers.Control;
         Add(VirtualKey.Number1, C, () => Navigate(typeof(TodayPage), null));
-        Add(VirtualKey.Number2, C, () => Navigate(typeof(ListsPage), "list:" + _s.Store.Inbox().Id));
+        Add(VirtualKey.Number2, C, () => Navigate(typeof(BoardPage), null));
         Add(VirtualKey.Number3, C, () => Navigate(typeof(CalendarPage), null));
         Add(VirtualKey.Number4, C, () => Navigate(typeof(DiaryPage), null));
-        Add(VirtualKey.Number5, C, () => Navigate(typeof(InsightsPage), null));
+        Add(VirtualKey.Number5, C, () => Navigate(typeof(ReportPage), null));
+        Add(VirtualKey.Number6, C, () => Navigate(typeof(InsightsPage), null));
+        Add(VirtualKey.Number7, C, () => Navigate(typeof(ListsPage), null));
+        Add(VirtualKey.Number8, C, () => Navigate(typeof(TagsPage), null));
         Add(VirtualKey.F, C, () => SearchBox.Focus(FocusState.Keyboard));
         Add((VirtualKey)188, C, () => Navigate(typeof(SettingsPage), null));      // Ctrl+,
         Add((VirtualKey)191, C, () => Navigate(typeof(ShortcutsPage), null));     // Ctrl+/

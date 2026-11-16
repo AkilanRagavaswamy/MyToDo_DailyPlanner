@@ -8,7 +8,7 @@ namespace MyTodo.Data;
 /// </summary>
 public sealed class Database : IDisposable
 {
-    public const int SchemaVersion = 1;
+    public const int SchemaVersion = 2;
     private readonly SqliteConnection _conn;
     private readonly object _gate = new();
 
@@ -91,6 +91,11 @@ public sealed class Database : IDisposable
                 foreach (var sql in Schema.V1)
                     using (var cmd = Command(c, tx, sql)) cmd.ExecuteNonQuery();
             }
+            if (current < 2)
+            {
+                foreach (var sql in Schema.V2)
+                    using (var cmd = Command(c, tx, sql)) cmd.ExecuteNonQuery();
+            }
             using var v = Command(c, tx, $"PRAGMA user_version = {SchemaVersion};");
             v.ExecuteNonQuery();
         });
@@ -106,7 +111,7 @@ internal static class Schema
 
     public static readonly string[] V1 =
     {
-        $"CREATE TABLE lists (id TEXT PRIMARY KEY, name TEXT NOT NULL, color TEXT NOT NULL, sort_order INTEGER NOT NULL, is_inbox INTEGER NOT NULL DEFAULT 0, {Common});",
+        $"CREATE TABLE lists (id TEXT PRIMARY KEY, name TEXT NOT NULL, color TEXT NOT NULL, sort_order INTEGER NOT NULL, {Common});",
         $"CREATE TABLE tasks (id TEXT PRIMARY KEY, list_id TEXT NOT NULL, parent_id TEXT, title TEXT NOT NULL, notes TEXT NOT NULL DEFAULT '', priority INTEGER NOT NULL DEFAULT 0, due INTEGER, due_has_time INTEGER NOT NULL DEFAULT 0, status INTEGER NOT NULL DEFAULT 0, completed INTEGER, archived INTEGER, sort_order INTEGER NOT NULL DEFAULT 0, rrule TEXT, repeat_after INTEGER NOT NULL DEFAULT 0, {Common});",
         "CREATE INDEX ix_tasks_list ON tasks(list_id, status);",
         "CREATE INDEX ix_tasks_due ON tasks(due);",
@@ -125,6 +130,17 @@ internal static class Schema
         // One row per reminder occurrence that has been shown, snoozed, dismissed or completed.
         "CREATE TABLE reminder_log (key TEXT PRIMARY KEY, state INTEGER NOT NULL, at INTEGER NOT NULL);",
         "CREATE VIRTUAL TABLE search_index USING fts5(kind UNINDEXED, ref_id UNINDEXED, title, body, tokenize='unicode61 remove_diacritics 2');"
+    };
+
+    /// <summary>
+    /// 1.0.1: the tag master. task_tags still holds the lowercase name, so this table adds identity,
+    /// colour and order without touching how a task records its tags. Rows for tags already in use are
+    /// filled in by DataStore on first open, not here, so they get palette colours.
+    /// </summary>
+    public static readonly string[] V2 =
+    {
+        $"CREATE TABLE tags (id TEXT PRIMARY KEY, name TEXT NOT NULL, color TEXT NOT NULL, sort_order INTEGER NOT NULL, {Common});",
+        "CREATE UNIQUE INDEX ux_tags_name ON tags(name) WHERE deleted = 0;"
     };
 }
 

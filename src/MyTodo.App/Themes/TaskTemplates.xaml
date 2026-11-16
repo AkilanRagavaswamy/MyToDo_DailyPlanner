@@ -3,16 +3,42 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:MyTodo.App.ViewModels">
 
+    <!-- Stage buttons. A row is dense, so there they are icon-only with the label on the tooltip and on
+         the automation peer; a board card has room, so there the label is drawn. -->
+    <DataTemplate x:Key="StageActionIconTemplate">
+        <Button Command="{Binding Command}" Padding="7,4" MinWidth="0" MinHeight="0" CornerRadius="5"
+                Background="Transparent" BorderThickness="0"
+                ToolTipService.ToolTip="{Binding Label}" AutomationProperties.Name="{Binding Label}">
+            <FontIcon Glyph="{Binding Glyph}" FontSize="13" Foreground="{Binding Foreground}" />
+        </Button>
+    </DataTemplate>
+
+    <DataTemplate x:Key="StageActionButtonTemplate">
+        <Button Command="{Binding Command}" Padding="9,4" MinWidth="0" MinHeight="0" CornerRadius="5"
+                AutomationProperties.Name="{Binding Label}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <FontIcon Glyph="{Binding Glyph}" FontSize="12" Foreground="{Binding Foreground}" />
+                <TextBlock Text="{Binding Label}" FontSize="12" Foreground="{Binding Foreground}" />
+            </StackPanel>
+        </Button>
+    </DataTemplate>
+
+    <ItemsPanelTemplate x:Key="StageActionPanel">
+        <StackPanel Orientation="Horizontal" Spacing="4" />
+    </ItemsPanelTemplate>
+
     <DataTemplate x:Key="TaskHeaderTemplate">
         <TextBlock Text="{Binding HeaderText}" FontSize="13" FontWeight="SemiBold" Margin="2,14,0,4"
                    Foreground="{ThemeResource Text2Brush}" />
     </DataTemplate>
 
     <DataTemplate x:Key="TaskItemTemplate">
-        <Grid Padding="4,10" ColumnSpacing="12">
+        <Grid Padding="4,10" ColumnSpacing="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
@@ -24,15 +50,95 @@
             <StackPanel Grid.Column="1" Spacing="3">
                 <TextBlock Text="{Binding Title}" FontWeight="Medium" TextWrapping="Wrap" Foreground="{Binding TitleBrush}"
                            TextDecorations="{Binding TitleDecorations}" />
-                <TextBlock Text="{Binding Meta}" FontSize="12" Foreground="{Binding MetaBrush}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding Meta}" FontSize="12" Foreground="{Binding MetaBrush}" TextWrapping="Wrap"
+                           Visibility="{Binding MetaVisibility}" />
             </StackPanel>
+            <Border Grid.Column="2" Background="{Binding StageFillBrush}" CornerRadius="9" Padding="8,2" VerticalAlignment="Center"
+                    Visibility="{Binding StageVisibility}">
+                <TextBlock Text="{Binding StageText}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding StageTextBrush}" />
+            </Border>
+            <ItemsControl Grid.Column="3" ItemsSource="{Binding Actions}" VerticalAlignment="Center"
+                          Visibility="{Binding ActionsVisibility}"
+                          ItemsPanel="{StaticResource StageActionPanel}"
+                          ItemTemplate="{StaticResource StageActionIconTemplate}" />
+            <FontIcon Grid.Column="4" Glyph="&#xE916;" FontSize="14" Foreground="{ThemeResource BrandAccentBrush}"
+                      VerticalAlignment="Center" Visibility="{Binding TimerVisibility}" ToolTipService.ToolTip="Timer running" />
+            <TextBlock Grid.Column="5" Text="{Binding PriorityText}" FontSize="12" FontWeight="SemiBold"
+                       VerticalAlignment="Center" Foreground="{Binding PriorityBrush}" />
+        </Grid>
+    </DataTemplate>
+
+    <!-- One card in a board column. Dragging moves the whole card, so the card itself carries no
+         click target other than its buttons. -->
+    <DataTemplate x:Key="BoardCardTemplate">
+        <Border Background="{ThemeResource SurfaceBrush}" BorderBrush="{ThemeResource LineBrush}" BorderThickness="1"
+                CornerRadius="8" Padding="12,10" Margin="0,0,0,8">
+            <StackPanel Spacing="8">
+                <TextBlock Text="{Binding Title}" FontWeight="Medium" TextWrapping="Wrap" MaxLines="3"
+                           TextTrimming="CharacterEllipsis" Foreground="{Binding TitleBrush}"
+                           TextDecorations="{Binding TitleDecorations}" />
+                <TextBlock Text="{Binding Meta}" FontSize="11" Foreground="{Binding MetaBrush}" TextWrapping="Wrap"
+                           Visibility="{Binding MetaVisibility}" />
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ItemsControl ItemsSource="{Binding Actions}" VerticalAlignment="Center"
+                                  Visibility="{Binding ActionsVisibility}"
+                                  ItemsPanel="{StaticResource StageActionPanel}"
+                                  ItemTemplate="{StaticResource StageActionButtonTemplate}" />
+                    <FontIcon Grid.Column="1" Glyph="&#xE916;" FontSize="13" Foreground="{ThemeResource BrandAccentBrush}"
+                              VerticalAlignment="Center" Visibility="{Binding TimerVisibility}" ToolTipService.ToolTip="Timer running" />
+                    <TextBlock Grid.Column="2" Text="{Binding PriorityText}" FontSize="12" FontWeight="SemiBold"
+                               VerticalAlignment="Center" Foreground="{Binding PriorityBrush}" />
+                </Grid>
+            </StackPanel>
+        </Border>
+    </DataTemplate>
+
+    <!-- The same row without the stage buttons, for the list view inside a SwipeControl: the swipe
+         already carries the actions, and drawing them twice on one row is just clutter. -->
+    <DataTemplate x:Key="TaskItemPlainTemplate">
+        <Grid Padding="14,12" ColumnSpacing="10" Background="{ThemeResource SurfaceBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Spacing="3">
+                <TextBlock Text="{Binding Title}" FontWeight="Medium" TextWrapping="Wrap" Foreground="{Binding TitleBrush}"
+                           TextDecorations="{Binding TitleDecorations}" />
+                <TextBlock Text="{Binding Meta}" FontSize="12" Foreground="{Binding MetaBrush}" TextWrapping="Wrap"
+                           Visibility="{Binding MetaVisibility}" />
+            </StackPanel>
+            <Border Grid.Column="1" Background="{Binding StageFillBrush}" CornerRadius="9" Padding="8,2" VerticalAlignment="Center"
+                    Visibility="{Binding StageVisibility}">
+                <TextBlock Text="{Binding StageText}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding StageTextBrush}" />
+            </Border>
             <FontIcon Grid.Column="2" Glyph="&#xE916;" FontSize="14" Foreground="{ThemeResource BrandAccentBrush}"
-                      Visibility="{Binding TimerVisibility}" ToolTipService.ToolTip="Timer running" />
-            <TextBlock Grid.Column="3" Text="{Binding PriorityText}" FontSize="12" FontWeight="SemiBold" Foreground="{Binding PriorityBrush}" />
+                      VerticalAlignment="Center" Visibility="{Binding TimerVisibility}" ToolTipService.ToolTip="Timer running" />
+            <TextBlock Grid.Column="3" Text="{Binding PriorityText}" FontSize="12" FontWeight="SemiBold"
+                       VerticalAlignment="Center" Foreground="{Binding PriorityBrush}" />
+            <Button Grid.Column="4" Command="{Binding ToggleCommand}" VerticalAlignment="Center" Padding="9,4"
+                    MinWidth="0" MinHeight="0" CornerRadius="5"
+                    ToolTipService.ToolTip="{Binding CompleteLabel}" AutomationProperties.Name="{Binding CompleteLabel}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="{Binding CompleteGlyph}" FontSize="12" Foreground="{Binding CompleteBrush}" />
+                    <TextBlock Text="{Binding CompleteText}" FontSize="12" Foreground="{Binding CompleteBrush}" />
+                </StackPanel>
+            </Button>
         </Grid>
     </DataTemplate>
 
     <vm:TaskRowTemplateSelector x:Key="TaskRowSelector"
                                 HeaderTemplate="{StaticResource TaskHeaderTemplate}"
                                 TaskTemplate="{StaticResource TaskItemTemplate}" />
+
+    <vm:TaskRowTemplateSelector x:Key="TaskRowPlainSelector"
+                                HeaderTemplate="{StaticResource TaskHeaderTemplate}"
+                                TaskTemplate="{StaticResource TaskItemPlainTemplate}" />
 </ResourceDictionary>

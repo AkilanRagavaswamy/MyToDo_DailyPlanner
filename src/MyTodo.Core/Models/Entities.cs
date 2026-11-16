@@ -15,10 +15,38 @@ public sealed class TodoList : Entity
     public string Name { get; set; } = "";
     public string Color { get; set; } = "#1F8A5B";
     public int SortOrder { get; set; }
-    public bool IsInbox { get; set; }
+
+    /// <summary>Colours handed out to new lists, in order, so the first few lists look distinct.</summary>
+    public static readonly string[] Palette = { "#1F8A5B", "#4A7FD6", "#F4A62A", "#B45AC7", "#D9534F", "#2AA6A6" };
+
+    public static string ColorFor(int index) => Palette[index % Palette.Length];
 }
 
-public enum TaskState { Open = 0, Completed = 1 }
+/// <summary>
+/// The stages a task moves through: Open → In progress → (On hold → In progress) → Completed.
+/// Open and Completed keep their 1.0.0.0 numbers, so rows written by the first release and the
+/// "status = 1" queries in the data layer keep their meaning; the two new stages were appended.
+/// </summary>
+public enum TaskState { Open = 0, Completed = 1, InProgress = 2, Hold = 3 }
+
+/// <summary>
+/// A tag in the tag master. Tags used to exist only where a task mentioned one; they are now rows of
+/// their own, so one can be created, renamed or recoloured before anything uses it. The link table
+/// still stores the lowercase name, which keeps every existing query and the quick-add parser working.
+/// </summary>
+public sealed class Tag : Entity
+{
+    public string Name { get; set; } = "";
+    public string Color { get; set; } = "#4A7FD6";
+    public int SortOrder { get; set; }
+
+    /// <summary>Tag names are matched and stored lowercase, so "#Q4" and "#q4" are one tag.</summary>
+    public static string Normalise(string raw) => raw.Trim().TrimStart('#').Trim().ToLowerInvariant();
+
+    public static readonly string[] Palette = { "#4A7FD6", "#1F8A5B", "#F4A62A", "#B45AC7", "#D9534F", "#2AA6A6", "#7A6FF0" };
+
+    public static string ColorFor(int index) => Palette[index % Palette.Length];
+}
 
 public sealed class TodoTask : Entity
 {
@@ -26,7 +54,7 @@ public sealed class TodoTask : Entity
     public Guid? ParentId { get; set; }
     public string Title { get; set; } = "";
     public string Notes { get; set; } = "";
-    /// <summary>0 = none, 1 = P1 (urgent) … 4 = P4.</summary>
+    /// <summary>0 = none, 1 = P1 (urgent) â¦ 4 = P4.</summary>
     public int Priority { get; set; }
     public DateTime? DueUtc { get; set; }
     public bool DueHasTime { get; set; }
@@ -41,7 +69,20 @@ public sealed class TodoTask : Entity
     public List<string> Tags { get; set; } = new();
 
     public bool IsCompleted => Status == TaskState.Completed;
+    public bool IsInProgress => Status == TaskState.InProgress;
+    public bool IsOnHold => Status == TaskState.Hold;
+    /// <summary>Open, In progress or On hold: work still outstanding. Every "not done" filter uses this.</summary>
+    public bool IsActive => Status != TaskState.Completed;
     public bool IsArchived => ArchivedUtc != null;
+
+    /// <summary>The stage name shown on a row or board card.</summary>
+    public string StageText => Status switch
+    {
+        TaskState.InProgress => "In progress",
+        TaskState.Hold => "On hold",
+        TaskState.Completed => "Completed",
+        _ => "Open"
+    };
 }
 
 public enum EventKind { Meeting = 0, Focus = 1, Personal = 2 }

@@ -12,8 +12,12 @@
   <Identity Name="MyToDo.DailyPlanner" Publisher="CN=MyTodoDeveloper" Version="1.0.0.0" />
 
   <Properties>
-    <DisplayName>My To-Do : Daily Planner</DisplayName>
-    <PublisherDisplayName>My To-Do</PublisherDisplayName>
+    <!-- Start menu search matches whole-word prefixes. "To-Do" tokenises as "To" + "Do" and "MyToDo"
+         is one token starting "My", so neither spelling is matched by a search for "todo". "My ToDo"
+         gives the word its own token, which "todo" prefixes. Identity Name is deliberately untouched:
+         changing it orphans the installed package and its data. -->
+    <DisplayName>My ToDo : Daily Planner</DisplayName>
+    <PublisherDisplayName>My ToDo</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -28,8 +32,8 @@
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="My To-Do : Daily Planner"
-        Description="Tasks, calendar, reminders and a work diary that stay on this PC."
+        DisplayName="My ToDo : Daily Planner"
+        Description="A to-do list, task board, calendar, reminders and work diary that stay on this PC."
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
@@ -44,14 +48,20 @@
         </desktop:Extension>
         <com:Extension Category="windows.comServer">
           <com:ComServer>
-            <com:ExeServer Executable="MyTodo.App.exe" Arguments="----AppNotificationActivated:" DisplayName="My To-Do reminders">
+            <com:ExeServer Executable="MyTodo.App.exe" Arguments="----AppNotificationActivated:" DisplayName="My ToDo reminders">
               <com:Class Id="7C2B5E3A-8F1D-4E6B-9A0C-2D4F6B8E1A35" />
             </com:ExeServer>
           </com:ComServer>
         </com:Extension>
+        <!-- "todo" from the Run box, a terminal or Start. Windows lists the alias alongside the app. -->
+        <uap5:Extension Category="windows.appExecutionAlias" Executable="MyTodo.App.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap5:AppExecutionAlias>
+            <uap5:ExecutionAlias Alias="todo.exe" />
+          </uap5:AppExecutionAlias>
+        </uap5:Extension>
         <!-- Launch at Windows startup (WIN-02); the user enables it in Settings or on first run. -->
         <uap5:Extension Category="windows.startupTask">
-          <uap5:StartupTask TaskId="MyTodoStartup" Enabled="false" DisplayName="My To-Do : Daily Planner" />
+          <uap5:StartupTask TaskId="MyTodoStartup" Enabled="false" DisplayName="My ToDo : Daily Planner" />
         </uap5:Extension>
       </Extensions>
     </Application>

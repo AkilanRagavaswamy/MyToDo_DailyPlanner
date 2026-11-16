@@ -17,15 +17,19 @@ public sealed partial class DataStore
         CreatedUtc = r.D("created"), UpdatedUtc = r.D("updated"), Deleted = r.B("deleted"), Version = r.I("version")
     };
 
-    private List<TodoTask> QueryTasks(string where, params (string, object?)[] args)
+    /// <summary>Tasks matching any WHERE clause, tombstones included. Only the board asks for those.</summary>
+    private List<TodoTask> QueryTasksRaw(string where, string orderBy, params (string, object?)[] args)
     {
-        var tasks = _db.Query($"SELECT * FROM tasks WHERE deleted = 0 AND {where} ORDER BY sort_order, created;", MapTask, args);
+        var tasks = _db.Query($"SELECT * FROM tasks WHERE {where} ORDER BY {orderBy};", MapTask, args);
         if (tasks.Count == 0) return tasks;
         var byId = tasks.ToDictionary(t => t.Id);
         foreach (var (taskId, tag) in _db.Query("SELECT task_id, tag FROM task_tags;", r => (r.G("task_id"), r.S("tag"))))
             if (byId.TryGetValue(taskId, out var t)) t.Tags.Add(tag);
         return tasks;
     }
+
+    private List<TodoTask> QueryTasks(string where, params (string, object?)[] args) =>
+        QueryTasksRaw($"deleted = 0 AND {where}", "sort_order, created", args);
 
     /// <summary>All live (not deleted) top-level and sub tasks. 10,000 tasks load in a few milliseconds.</summary>
     public List<TodoTask> GetAllTasks(bool includeArchived = false) =>
@@ -35,6 +39,15 @@ public sealed partial class DataStore
     public List<TodoTask> GetSubtasks(Guid parentId) => QueryTasks("parent_id = $p", ("$p", parentId.ToString()));
     public List<TodoTask> GetArchivedTasks() => QueryTasks("archived IS NOT NULL");
     public TodoTask? GetTask(Guid id) => QueryTasks("id = $id", ("$id", id.ToString())).FirstOrDefault();
+
+    /// <summary>A task by id including a tombstoned one. The board keeps deleted cards on screen,
+    /// so it has to be able to look one up after the delete.</summary>
+    public TodoTask? FindTask(Guid id) => QueryTasksRaw("id = $id", "sort_order", ("$id", id.ToString())).FirstOrDefault();
+
+    /// <summary>Recently deleted top-level tasks, newest first. They are tombstones, not live rows:
+    /// nothing but the board reads them, and RestoreTask is the only way back.</summary>
+    public List<TodoTask> GetDeletedTasks(int limit = 50) =>
+        QueryTasksRaw("deleted = 1 AND parent_id IS NULL", $"updated DESC LIMIT {limit}");
 
     public List<TodoTask> GetCompletedBetween(DateTime fromUtc, DateTime toUtc) =>
         QueryTasks("status = 1 AND completed >= $f AND completed < $t", ("$f", Conv.Ms(fromUtc)), ("$t", Conv.Ms(toUtc)));
@@ -55,7 +68,8 @@ public sealed partial class DataStore
                 ("$rrule", t.Rrule), ("$rep", t.RepeatAfterCompletion ? 1 : 0));
 
             using (var del = Database.Command(c, tx, "DELETE FROM task_tags WHERE task_id = $id;", ("$id", t.Id.ToString()))) del.ExecuteNonQuery();
-            foreach (var tag in t.Tags.Select(x => x.Trim().TrimStart('#').ToLowerInvariant()).Where(x => x.Length > 0).Distinct())
+            EnsureTags(c, tx, t.Tags);
+            foreach (var tag in t.Tags.Select(Core.Models.Tag.Normalise).Where(x => x.Length > 0).Distinct())
                 using (var ins = Database.Command(c, tx, "INSERT INTO task_tags (task_id, tag) VALUES ($id, $tag);", ("$id", t.Id.ToString()), ("$tag", tag)))
                     ins.ExecuteNonQuery();
 
@@ -84,6 +98,8 @@ public sealed partial class DataStore
     public TodoTask CompleteTask(TodoTask t, DateTime? nowUtc = null)
     {
         var now = nowUtc ?? DateTime.UtcNow;
+        // Finishing the work stops the clock; otherwise a completed task would go on billing time.
+        if (GetRunningTimer() is { } running && running.TaskId == t.Id) StopTimer(now);
         if (t.Rrule == null)
         {
             t.Status = TaskState.Completed;
@@ -117,12 +133,66 @@ public sealed partial class DataStore
         return done;
     }
 
-    public void ReopenTask(TodoTask t)
+    /// <summary>Back to Open from any stage, including out of the archive. Any timer this task was
+    /// holding is closed, because an Open task is by definition not being worked on.</summary>
+    public void ReopenTask(TodoTask t, DateTime? nowUtc = null)
     {
+        if (GetRunningTimer() is { } running && running.TaskId == t.Id) StopTimer(nowUtc ?? DateTime.UtcNow);
         t.Status = TaskState.Open;
         t.CompletedUtc = null;
         t.ArchivedUtc = null;
         SaveTask(t);
+    }
+
+    // ---------------- Stages: Open -> In progress -> On hold -> Completed ----------------
+
+    /// <summary>
+    /// Moves a task to In progress and starts its timer. Any other task that was in progress is put on
+    /// hold: only one timer runs at a time, so leaving a second task "in progress" with a stopped clock
+    /// would misreport what is actually being worked on.
+    /// </summary>
+    public void StartTask(TodoTask t, DateTime? nowUtc = null)
+    {
+        var now = nowUtc ?? DateTime.UtcNow;
+        foreach (var other in QueryTasks("status = $s", ("$s", (int)TaskState.InProgress)).Where(x => x.Id != t.Id))
+        {
+            other.Status = TaskState.Hold;
+            SaveTask(other, raise: false);
+        }
+        t.Status = TaskState.InProgress;
+        t.CompletedUtc = null;
+        t.ArchivedUtc = null;
+        SaveTask(t, raise: false);
+        StartTimer(t.Id, now);
+        Raise("tasks");
+    }
+
+    /// <summary>Pauses a task. The open time entry is closed, so the minutes worked so far are kept and
+    /// the next Resume adds a second stretch rather than restarting the count.</summary>
+    public void HoldTask(TodoTask t, DateTime? nowUtc = null)
+    {
+        if (GetRunningTimer() is { } running && running.TaskId == t.Id) StopTimer(nowUtc ?? DateTime.UtcNow);
+        t.Status = TaskState.Hold;
+        SaveTask(t);
+    }
+
+    /// <summary>Picks a held task back up: same transition as Start, named for what the button says.</summary>
+    public void ResumeTask(TodoTask t, DateTime? nowUtc = null) => StartTask(t, nowUtc);
+
+    /// <summary>Undoes a delete: the task and its subtasks lose their tombstones and return at the stage
+    /// they were deleted in.</summary>
+    public void RestoreTask(Guid id)
+    {
+        var t = FindTask(id);
+        if (t is not { Deleted: true }) return;
+        foreach (var s in QueryTasksRaw("deleted = 1 AND parent_id = $p", "sort_order", ("$p", id.ToString())))
+        {
+            s.Deleted = false;
+            SaveTask(s, raise: false);
+        }
+        t.Deleted = false;
+        SaveTask(t, raise: false);
+        Raise("tasks");
     }
 
     /// <summary>TSK-11: archive tasks completed more than <paramref name="days"/> days ago.</summary>

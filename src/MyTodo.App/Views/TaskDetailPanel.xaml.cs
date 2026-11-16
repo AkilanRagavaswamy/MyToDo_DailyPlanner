@@ -22,6 +22,8 @@ public sealed partial class TaskDetailPanel : UserControl
     private TodoTask? _task;
     private bool _loading;
     private List<(string Label, string? Rrule, bool AfterCompletion)> _repeatOptions = new();
+    /// <summary>The task's tags while the panel is open. Chips and the picker edit this, then save.</summary>
+    private readonly List<string> _tags = new();
 
     public event Action? CloseRequested;
     public event Action? TaskChanged;
@@ -40,6 +42,7 @@ public sealed partial class TaskDetailPanel : UserControl
             k.Invoked += (_, e) => { a(); e.Handled = true; };
             KeyboardAccelerators.Add(k);
         }
+        Acc(VirtualKey.Escape, VirtualKeyModifiers.None, () => CloseRequested?.Invoke());
         Acc(VirtualKey.Enter, VirtualKeyModifiers.Control, ToggleDone);
         Acc(VirtualKey.D, VirtualKeyModifiers.Control, () => { DuePicker.Focus(FocusState.Keyboard); DuePicker.IsCalendarOpen = true; });
         Acc(VirtualKey.T, VirtualKeyModifiers.Control, () => Timer_Click(this, new RoutedEventArgs()));
@@ -70,7 +73,9 @@ public sealed partial class TaskDetailPanel : UserControl
             DueTime.SelectedTime = new TimeSpan(9, 0, 0);
         }
         DueTime.IsEnabled = TimeToggle.IsOn && task.DueUtc != null;
-        TagsBox.Text = string.Join(" ", task.Tags.Select(t => "#" + t));
+        _tags.Clear();
+        _tags.AddRange(task.Tags);
+        LoadTags();
         NotesBox.Text = task.Notes;
         CreatedText.Text = $"Created {Ui.Local(task.CreatedUtc):d MMM yyyy}" + (task.IsArchived ? " · Archived" : "");
         BuildRepeatOptions();
@@ -145,7 +150,7 @@ public sealed partial class TaskDetailPanel : UserControl
         var repeat = RepeatCombo.SelectedIndex >= 0 && RepeatCombo.SelectedIndex < _repeatOptions.Count ? _repeatOptions[RepeatCombo.SelectedIndex] : default;
         t.Rrule = t.DueUtc == null ? null : repeat.Rrule;
         t.RepeatAfterCompletion = repeat.AfterCompletion;
-        t.Tags = TagsBox.Text.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.TrimStart('#').ToLowerInvariant()).Where(x => x.Length > 0).Distinct().ToList();
+        t.Tags = _tags.ToList();
         t.Notes = NotesBox.Text;
         _s.Store.SaveTask(t);
 
@@ -184,6 +189,78 @@ public sealed partial class TaskDetailPanel : UserControl
         _task = null;
         TaskChanged?.Invoke();
         CloseRequested?.Invoke();
+    }
+
+    // ---------------- tags ----------------
+
+    /// <summary>
+    /// A chip per tag with an X, and a picker listing every tag in the master. Any number can be on one
+    /// task; ticking one here is the same as typing #name in quick add, and a name that is not in the
+    /// master yet is created by the save.
+    /// </summary>
+    private void LoadTags()
+    {
+        TagChips.Items.Clear();
+        var known = _s.Store.GetTags().ToDictionary(t => t.Name, t => t.Color);
+        foreach (var name in _tags.OrderBy(x => x))
+        {
+            var tag = name;
+            var colour = known.TryGetValue(tag, out var hex) ? Ui.Hex(hex) : Ui.Brush("Text2Brush");
+            var label = new TextBlock { Text = "#" + tag, FontSize = 12, Foreground = colour, VerticalAlignment = VerticalAlignment.Center };
+            var remove = new Button
+            {
+                Content = new FontIcon { Glyph = "", FontSize = 9 },
+                Padding = new Thickness(3), MinWidth = 0, MinHeight = 0,
+                Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent),
+                BorderThickness = new Thickness(0)
+            };
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(remove, "Remove tag " + tag);
+            remove.Click += (_, _) => { _tags.Remove(tag); Save(); LoadTags(); };
+
+            var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2 };
+            row.Children.Add(label);
+            row.Children.Add(remove);
+            TagChips.Items.Add(new Border
+            {
+                Background = Ui.Brush("Surface2Brush"), CornerRadius = new CornerRadius(11),
+                Padding = new Thickness(9, 2, 4, 2), Margin = new Thickness(0, 0, 6, 4),
+                HorizontalAlignment = HorizontalAlignment.Left, Child = row
+            });
+        }
+
+        var menu = new MenuFlyout();
+        foreach (var tag in _s.Store.GetTags())
+        {
+            var name = tag.Name;
+            var item = new ToggleMenuFlyoutItem { Text = "#" + name, IsChecked = _tags.Contains(name) };
+            item.Click += (_, _) =>
+            {
+                if (_tags.Contains(name)) _tags.Remove(name); else _tags.Add(name);
+                Save();
+                LoadTags();
+            };
+            menu.Items.Add(item);
+        }
+        if (menu.Items.Count > 0) menu.Items.Add(new MenuFlyoutSeparator());
+        var create = new MenuFlyoutItem { Text = "New tag…", Icon = new SymbolIcon(Symbol.Add) };
+        create.Click += async (_, _) => await NewTagAsync();
+        menu.Items.Add(create);
+        TagPicker.Flyout = menu;
+    }
+
+    private async Task NewTagAsync()
+    {
+        var existing = _s.Store.GetTags();
+        var r = await NameColourDialog.ShowAsync(XamlRoot, "New tag", "Create", "",
+            Core.Models.Tag.ColorFor(existing.Count), Core.Models.Tag.Palette, "planning");
+        if (!r.Confirmed) return;
+        var name = Core.Models.Tag.Normalise(r.Name);
+        if (name.Length == 0) return;
+        if (existing.All(t => t.Name != name))
+            _s.Store.SaveTag(new Core.Models.Tag { Name = name, Color = r.Colour, SortOrder = existing.Count });
+        if (!_tags.Contains(name)) _tags.Add(name);
+        Save();
+        LoadTags();
     }
 
     // ---------------- reminders ----------------
@@ -229,7 +306,88 @@ public sealed partial class TaskDetailPanel : UserControl
             Option("On the day, 12:00 PM", new Reminder { Kind = ReminderKind.DateOnlyAt, DayOffset = 0, TimeOfDayMinutes = 12 * 60 });
             Option("2 days before, 9:00 AM", new Reminder { Kind = ReminderKind.DateOnlyAt, DayOffset = -2, TimeOfDayMinutes = 9 * 60 });
         }
+        menu.Items.Add(new MenuFlyoutSeparator());
+        var custom = new MenuFlyoutItem { Text = "Custom…" };
+        custom.Click += async (_, _) =>
+        {
+            if (await AskCustomReminderAsync(t.DueHasTime) is not { } made) return;
+            made.OwnerId = t.Id;
+            reminders.Add(made);
+            _s.Store.SaveReminders(ReminderOwner.Task, t.Id, reminders);
+            LoadReminders();
+        };
+        menu.Items.Add(custom);
         AddReminderButton.Flyout = menu;
+    }
+
+    /// <summary>
+    /// A reminder at a time the presets do not cover. A task with a due time can be reminded a chosen
+    /// amount before it; any task can be reminded on a chosen day at a chosen clock time. Returns null
+    /// if the dialog was cancelled.
+    /// </summary>
+    private async Task<Reminder?> AskCustomReminderAsync(bool hasDueTime)
+    {
+        var beforeRadio = new RadioButton { Content = "Before the due time", IsChecked = hasDueTime, IsEnabled = hasDueTime };
+        var amount = new NumberBox { Value = 30, Minimum = 1, Maximum = 999, SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Compact, Width = 110 };
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(amount, "How long before");
+        var unit = new ComboBox { Width = 120, SelectedIndex = 0 };
+        foreach (var u in new[] { "minutes", "hours", "days" }) unit.Items.Add(u);
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(unit, "Unit");
+        var beforeRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(28, 0, 0, 0) };
+        beforeRow.Children.Add(amount);
+        beforeRow.Children.Add(unit);
+
+        var atRadio = new RadioButton { Content = "On a day, at a time", IsChecked = !hasDueTime };
+        var dayOffset = new ComboBox { Width = 150, SelectedIndex = 1 };
+        foreach (var d in new[] { "On the day", "1 day before", "2 days before", "3 days before", "1 week before" }) dayOffset.Items.Add(d);
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(dayOffset, "Which day");
+        var clock = new TimePicker { ClockIdentifier = "24HourClock", MinuteIncrement = 5, SelectedTime = new TimeSpan(9, 0, 0) };
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(clock, "Time of day");
+        var atRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(28, 0, 0, 0) };
+        atRow.Children.Add(dayOffset);
+        atRow.Children.Add(clock);
+
+        void Sync()
+        {
+            var before = beforeRadio.IsChecked == true;
+            amount.IsEnabled = unit.IsEnabled = before;
+            dayOffset.IsEnabled = clock.IsEnabled = !before;
+        }
+        beforeRadio.Checked += (_, _) => Sync();
+        atRadio.Checked += (_, _) => Sync();
+        Sync();
+
+        var panel = new StackPanel { Spacing = 8, Width = 330 };
+        panel.Children.Add(beforeRadio);
+        panel.Children.Add(beforeRow);
+        if (!hasDueTime)
+            panel.Children.Add(new TextBlock
+            {
+                Text = "This task has no due time, so it can only be reminded on a day.",
+                FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(28, 0, 0, 0),
+                Foreground = Ui.Brush("Text2Brush")
+            });
+        panel.Children.Add(atRadio);
+        panel.Children.Add(atRow);
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = XamlRoot, Title = "Custom reminder", Content = panel,
+            PrimaryButtonText = "Add", CloseButtonText = "Cancel", DefaultButton = ContentDialogButton.Primary
+        };
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return null;
+
+        if (beforeRadio.IsChecked == true)
+        {
+            var n = double.IsNaN(amount.Value) ? 0 : (int)amount.Value;
+            if (n <= 0) return null;
+            var minutes = unit.SelectedIndex switch { 1 => n * 60, 2 => n * 60 * 24, _ => n };
+            return new Reminder { Kind = ReminderKind.BeforeStart, OffsetMinutes = minutes };
+        }
+
+        var days = dayOffset.SelectedIndex switch { 1 => -1, 2 => -2, 3 => -3, 4 => -7, _ => 0 };
+        var time = clock.SelectedTime ?? new TimeSpan(9, 0, 0);
+        return new Reminder { Kind = ReminderKind.DateOnlyAt, DayOffset = days, TimeOfDayMinutes = (int)time.TotalMinutes };
     }
 
     // ---------------- subtasks ----------------
@@ -348,8 +506,9 @@ public sealed partial class TaskDetailPanel : UserControl
     {
         var t = _task!;
         var running = _s.Timer.Running?.TaskId == t.Id;
-        TimerButton.Content = running ? "Stop" : "Start";
-        TimerStatus.Text = running ? $"Running since {Ui.Local(_s.Timer.Running!.StartUtc):HH:mm}" : "Timer stopped";
+        TimerButton.Content = running ? "Hold" : t.IsOnHold ? "Resume" : "Start";
+        TimerButton.IsEnabled = !t.IsCompleted;
+        TimerStatus.Text = running ? $"Running since {Ui.Local(_s.Timer.Running!.StartUtc):HH:mm}" : t.StageText;
         TimerElapsed.Text = running ? _s.Timer.ElapsedText : "";
         var entries = _s.Store.GetTimeEntries(t.Id).Where(x => !x.IsRunning).ToList();
         TimeTitle.Text = $"Time spent · {InsightsCalculator.FormatMinutes(entries.Sum(x => x.Minutes))}";
@@ -374,10 +533,13 @@ public sealed partial class TaskDetailPanel : UserControl
         }
     }
 
+    /// <summary>The timer button is the stage button: a running clock is what "In progress" means, so
+    /// starting one moves the task there and stopping one puts it on hold.</summary>
     private void Timer_Click(object sender, RoutedEventArgs e)
     {
-        if (_task == null) return;
-        _s.Timer.Toggle(_task.Id);
+        if (_task is not { IsCompleted: false } t) return;
+        if (_s.Timer.Running?.TaskId == t.Id) _s.Store.HoldTask(t);
+        else _s.Store.StartTask(t);
         TaskChanged?.Invoke();
     }
 

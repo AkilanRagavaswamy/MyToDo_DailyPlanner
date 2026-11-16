@@ -28,6 +28,7 @@ public sealed partial class TodayPage : Page, INewTaskTarget, IThemeAware
         Schedule.EventInvoked += async occ => await CalendarActions.EditAsync(XamlRoot, _s, occ, null);
         Schedule.EventDeleteRequested += async occ => await CalendarActions.DeleteAsync(XamlRoot, _s, occ);
         Schedule.CreateRequested += async start => await CalendarActions.EditAsync(XamlRoot, _s, null, start);
+        EmptyHint.Text = $"Press Ctrl+N, or {_s.Settings.QuickAddHotkey} from any app, to plan your day.";
         Detail.CloseRequested += () => Split.IsPaneOpen = false;
         Detail.TaskChanged += Refresh;
     }
@@ -69,7 +70,7 @@ public sealed partial class TodayPage : Page, INewTaskTarget, IThemeAware
             .OrderBy(t => t.DueHasTime ? 0 : 1).ThenBy(t => t.DueUtc).ThenBy(t => t.Priority == 0 ? 9 : t.Priority).ToList();
         var doneToday = top.Where(t => t.IsCompleted && t.CompletedUtc is DateTime c && DateOnly.FromDateTime(Ui.Local(c)) == today).ToList();
 
-        var builder = new TaskRowBuilder(_s.Store, all, _s.Timer.Running?.TaskId, Toggle);
+        var builder = new TaskRowBuilder(_s.Store, all, _s.Timer.Running?.TaskId, Toggle, Stages);
         var rows = new List<TaskRow>();
         if (overdue.Count > 0) { rows.Add(TaskRow.Header($"Overdue · {overdue.Count}")); rows.AddRange(overdue.Select(t => builder.Row(t))); }
         if (overdue.Count > 0 && dueToday.Count > 0) rows.Add(TaskRow.Header("Today"));
@@ -79,12 +80,23 @@ public sealed partial class TodayPage : Page, INewTaskTarget, IThemeAware
         EmptyState.Visibility = rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
         var total = overdue.Count + dueToday.Count + doneToday.Count;
+        // An empty track on a day with nothing planned reads as a stray underline, so hide the block entirely.
+        ProgressPanel.Visibility = total == 0 ? Visibility.Collapsed : Visibility.Visible;
         ProgressText.Text = $"{doneToday.Count} of {total} done";
         Progress.Value = total == 0 ? 0 : doneToday.Count / (double)total;
 
         var from = Ui.ToUtc(today.ToDateTime(TimeOnly.MinValue));
         Schedule.Show(today, 1, _s.Store.GetOccurrences(from, from.AddDays(1)));
     }
+
+    private TaskStageHandlers Stages => new()
+    {
+        Start = t => _s.Store.StartTask(t),
+        Hold = t => _s.Store.HoldTask(t),
+        Complete = Toggle,
+        Reopen = t => _s.Store.ReopenTask(t),
+        Delete = DeleteWithUndo
+    };
 
     private void Toggle(TodoTask t)
     {
@@ -98,6 +110,19 @@ public sealed partial class TodayPage : Page, INewTaskTarget, IThemeAware
                 _s.Store.DeleteTask(done.Id);
                 if (_s.Store.GetTask(t.Id) is TodoTask original && done.DueUtc != null) { original.DueUtc = done.DueUtc; _s.Store.SaveTask(original); }
             }
+        });
+    }
+
+    private void DeleteWithUndo(TodoTask t)
+    {
+        var subs = _s.Store.GetSubtasks(t.Id);
+        _s.Store.DeleteTask(t.Id);
+        if (Detail.Task?.Id == t.Id) Split.IsPaneOpen = false;
+        _undo.Show($"“{t.Title}” deleted.", () =>
+        {
+            t.Deleted = false;
+            _s.Store.SaveTask(t);
+            foreach (var s in subs) { s.Deleted = false; _s.Store.SaveTask(s); }
         });
     }
 

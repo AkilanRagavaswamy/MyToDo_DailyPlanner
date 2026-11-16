@@ -10,7 +10,7 @@ public static class IcsWriter
     public static string Write(IEnumerable<CalendarEvent> events)
     {
         var sb = new StringBuilder();
-        sb.Append("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//My To-Do//Daily Planner 1.0//EN\r\nCALSCALE:GREGORIAN\r\n");
+        sb.Append("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//My ToDo//Daily Planner 1.0//EN\r\nCALSCALE:GREGORIAN\r\n");
         foreach (var e in events.Where(e => !e.Deleted))
         {
             sb.Append("BEGIN:VEVENT\r\n");
