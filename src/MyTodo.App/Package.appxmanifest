@@ -9,7 +9,7 @@
   IgnorableNamespaces="uap uap5 desktop com rescap">
 
   <!-- Name and Publisher are replaced by "Associate App with the Store" in Visual Studio. -->
-  <Identity Name="MyToDo.DailyPlanner" Publisher="CN=MyTodoDeveloper" Version="1.0.0.0" />
+  <Identity Name="AkilanRagavaswamy.MyToDoDailyPlanner" Publisher="CN=4FEF7FAB-6AD4-4C46-88A8-05AFF705DD4C" Version="1.0.0.0" />
 
   <Properties>
     <!-- Start menu search matches whole-word prefixes. "To-Do" tokenises as "To" + "Do" and "MyToDo"
@@ -17,7 +17,7 @@
          gives the word its own token, which "todo" prefixes. Identity Name is deliberately untouched:
          changing it orphans the installed package and its data. -->
     <DisplayName>My ToDo : Daily Planner</DisplayName>
-    <PublisherDisplayName>My ToDo</PublisherDisplayName>
+    <PublisherDisplayName>Akilan Ragavaswamy</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
