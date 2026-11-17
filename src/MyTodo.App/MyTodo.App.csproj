@@ -30,6 +30,13 @@
   <ItemGroup>
     <!-- Latest stable Windows App SDK at the time of writing; update in NuGet if a newer stable exists. -->
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
+    <!--
+      The Windows App SDK meta-package pulls Windows ML, whose native payload is onnxruntime.dll and
+      DirectML.dll: 40 MB per architecture. This app runs no models, so the native assets are dropped
+      and the managed projection is kept, which leaves anything that merely references the types able
+      to compile. Remove ExcludeAssets if the app ever starts using Windows ML.
+    -->
+    <PackageReference Include="Microsoft.Windows.AI.MachineLearning" Version="2.1.70" ExcludeAssets="native" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="H.NotifyIcon.WinUI" Version="2.3.0" />
   </ItemGroup>
