@@ -1,6 +1,6 @@
 # Privacy Policy — My To-Do : Daily Planner
 
-Last updated: [publish date]
+Last updated: 17-11-2026
 
 My To-Do : Daily Planner ("the app") stores your tasks, calendar, diary, attachments and settings only on your PC.
 
@@ -30,4 +30,4 @@ Changes to this policy are published at this address with a new "Last updated" d
 
 ## Contact
 
-Questions about this policy: [your support email].
+Questions about this policy: [Raise it here](https://github.com/AkilanRagavaswamy/MyToDo_DailyPlanner/issues).
