@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Keyboard shortcuts</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height: 960px; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 14px">
+<dc-import name="TitleBar" theme="{{theme}}" hint-size="100%,48px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="NavPane" theme="{{theme}}" active="settings" hint-size="248px,752px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; background: {{t.surface2}}; border-top-left-radius: 8px; border: 1px solid {{t.border}}; box-sizing: border-box; padding: 24px 28px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+<div>
+<a href="{{settingsHref}}" style="font-size: 13px; color: {{t.accent}}; text-decoration: none">Settings</a>
+<h1 style="margin: 2px 0 0; font-size: 28px; font-weight: 600">Keyboard shortcuts</h1>
+<p style="margin: 4px 0 0; color: {{t.text2}}">Press Ctrl + / anywhere in the app to open this page.</p>
+</div>
+<label style="display: flex; align-items: center; gap: 8px; width: 280px; height: 34px; padding: 0 10px; box-sizing: border-box; border-radius: 4px; background: {{t.surface}}; border: 1px solid {{t.border}}">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{t.text2}}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"></path></svg>
+<input type="search" aria-label="Find a shortcut" placeholder="Find a shortcut" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 13px; color: {{t.text}}">
+</label>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 14px; align-items: start">
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="6">
+<section style="padding: 14px 16px; border-radius: 8px; background: {{t.surface}}; border: 1px solid {{t.border}}; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 2px; font-size: 15px; font-weight: 600">{{g.title}}</h2>
+<sc-if value="{{g.note}}" hint-placeholder-val="{{false}}"><p style="margin: 0 0 6px; font-size: 12px; color: {{t.text2}}">{{g.note}}</p></sc-if>
+<sc-for list="{{g.items}}" as="s" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid {{t.border}}">
+<span style="font-size: 13px">{{s.label}}</span>
+<span style="display: flex; align-items: center; gap: 4px; flex: none">
+<sc-for list="{{s.keys}}" as="k" hint-placeholder-count="2"><kbd style="font: inherit; font-size: 12px; min-width: 14px; text-align: center; padding: 2px 7px; border-radius: 4px; border: 1px solid {{t.border}}; border-bottom-width: 2px; background: {{t.surface2}}; color: {{t.text}}">{{k}}</kbd></sc-for>
+</span>
+</div>
+</sc-for>
+</section>
+</sc-for>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',surface:'#FFFFFF',surface2:'#F6F8F6',border:'#DCE2DE',text:'#1A1F1C',text2:'#56605A',accent:'#17784C'},
+      dark: {bg:'#191C1A',surface:'#232725',surface2:'#2B302D',border:'#3A413C',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6'}
+    };
+    const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+    const t = T[theme];
+    const s = (label, keys) => ({ label, keys });
+    const groups = [
+      { title: 'Anywhere in Windows', note: 'Change it in Settings › Startup and tray.', items: [s('Quick add a task', ['Win', 'Shift', 'T']), s('Windows notification centre', ['Win', 'N'])] },
+      { title: 'Navigation', note: '', items: [s('Today', ['Ctrl', '1']), s('Lists', ['Ctrl', '2']), s('Calendar', ['Ctrl', '3']), s('Diary', ['Ctrl', '4']), s('Insights', ['Ctrl', '5']), s('Search', ['Ctrl', 'F']), s('Settings', ['Ctrl', ',']), s('Keyboard shortcuts', ['Ctrl', '/']), s('Go back', ['Alt', '←'])] },
+      { title: 'Tasks', note: '', items: [s('New task', ['Ctrl', 'N']), s('Open details', ['Enter']), s('Complete or reopen', ['Ctrl', 'Enter']), s('Set due date', ['Ctrl', 'D']), s('Set priority P1 – P4', ['Ctrl', 'Shift', '1 – 4']), s('Start or stop timer', ['Ctrl', 'T']), s('Attach a file', ['Ctrl', 'Shift', 'A']), s('Move up or down', ['Alt', '↑ / ↓']), s('Delete', ['Delete']), s('Undo', ['Ctrl', 'Z'])] },
+      { title: 'Calendar', note: '', items: [s('Go to today', ['Home']), s('Previous or next period', ['Ctrl', '← / →']), s('Day view', ['Alt', '1']), s('Work week view', ['Alt', '2']), s('Week view', ['Alt', '3']), s('Month view', ['Alt', '4']), s('New event', ['Ctrl', 'Shift', 'N']), s('Move event by 15 minutes', ['Alt', '↑ / ↓']), s('Resize event by 15 minutes', ['Shift', 'Alt', '↑ / ↓'])] },
+      { title: 'Diary', note: '', items: [s('Bold', ['Ctrl', 'B']), s('Italic', ['Ctrl', 'I']), s('Underline', ['Ctrl', 'U']), s('Heading', ['Ctrl', 'Alt', '1']), s('Bulleted list', ['Ctrl', 'Shift', 'L']), s('Insert link', ['Ctrl', 'K']), s('Previous or next day', ['Ctrl', 'PgUp / PgDn'])] },
+      { title: 'Window and sync', note: '', items: [s('Sync now', ['F5']), s('Close to the tray', ['Ctrl', 'W']), s('Exit the app', ['Ctrl', 'Q']), s('Snooze a focused reminder', ['Alt', 'S']), s('Dismiss a focused reminder', ['Esc'])] }
+    ];
+    return { theme, t, groups, settingsHref: theme === 'dark' ? 'Settings-Dark.dc.html' : 'Settings.dc.html' };
+  }
+}
+</script>
+</body>
+</html>

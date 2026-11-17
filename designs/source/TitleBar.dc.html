@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Title bar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<header style="height: 48px; display: flex; align-items: center; gap: 12px; padding-left: 14px; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 12px; box-sizing: border-box">
+<svg width="20" height="20" viewBox="0 0 512 512" role="img" aria-label="My To-Do : Daily Planner"><rect x="40" y="64" width="432" height="416" rx="104" fill="#1F8A5B"></rect><rect x="148" y="28" width="44" height="92" rx="22" fill="#0E5A37"></rect><rect x="320" y="28" width="44" height="92" rx="22" fill="#0E5A37"></rect><path d="M142 300 L222 378 L350 230" fill="none" stroke="#FFFFFF" stroke-width="58" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="394" cy="180" r="38" fill="#F4A62A"></circle></svg>
+<span style="white-space: nowrap">My To-Do : Daily Planner</span>
+<div style="flex: 1 1 auto; display: flex; justify-content: center; min-width: 0">
+<label style="display: flex; align-items: center; gap: 8px; width: 100%; max-width: 440px; height: 32px; padding: 0 10px; box-sizing: border-box; border-radius: 4px; background: {{t.surface}}; border: 1px solid {{t.border}}">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{t.text2}}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"></path></svg>
+<input type="search" aria-label="Search tasks, events and diary" placeholder="Search tasks, events, diary" value="{{query}}" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 13px; color: {{t.text}}">
+<kbd style="font: inherit; font-size: 11px; color: {{t.text2}}">Ctrl+F</kbd>
+</label>
+</div>
+<span style="display: flex; align-items: center; gap: 6px; color: {{t.text2}}; white-space: nowrap">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{t.accent}}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-9 6 6 0 0 1 11.4 1.6A4 4 0 0 1 17 18zM9.5 13.5l2 2 3.5-3.5"></path></svg>
+Synced 2 min ago
+</span>
+<button aria-label="Sync now (F5)" style="width: 32px; height: 32px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.3L4 9M4 4v5h5M4 13a8 8 0 0 0 14.3 4.3L20 15M20 20v-5h-5"></path></svg></button>
+<div style="display: flex; align-self: stretch">
+<button aria-label="Minimize" style="width: 46px; border: 0; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 5h10" stroke="currentColor" stroke-width="1"></path></svg></button>
+<button aria-label="Maximize" style="width: 46px; border: 0; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><rect x="0.5" y="0.5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1"></rect></svg></button>
+<button aria-label="Close to tray" style="width: 46px; border: 0; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 0l10 10M10 0L0 10" stroke="currentColor" stroke-width="1"></path></svg></button>
+</div>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"query":{"editor":null,"default":""},"$preview":{"width":1280,"height":48}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',surface:'#FFFFFF',border:'#DCE2DE',text:'#1A1F1C',text2:'#56605A',accent:'#17784C'},
+      dark: {bg:'#191C1A',surface:'#232725',border:'#3A413C',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6'}
+    };
+    const t = T[this.props.theme === 'dark' ? 'dark' : 'light'];
+    return { t, query: this.props.query ?? '' };
+  }
+}
+</script>
+</body>
+</html>

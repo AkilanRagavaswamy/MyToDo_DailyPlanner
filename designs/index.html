@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My To-Do : Daily Planner · screen designs</title>
+<style>
+:root{color-scheme:light dark;--bg:#EEF2EF;--card:#fff;--text:#1A1F1C;--text2:#56605A;--line:#DCE2DE;--accent:#17784C}
+@media (prefers-color-scheme:dark){:root{--bg:#191C1A;--card:#232725;--text:#F1F4F2;--text2:#B2BBB5;--line:#3A413C;--accent:#72D9A6}}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif}
+main{max-width:1320px;margin:0 auto;padding:32px 24px 64px}
+h1{font-size:28px;margin:0 0 4px} h2{font-size:18px;margin:36px 0 14px} p{color:var(--text2);margin:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+.card{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px}
+.card:hover,.card:focus-visible{border-color:var(--accent);outline:none}
+.thumb{overflow:hidden;border-radius:6px;border:1px solid var(--line);position:relative}
+.thumb iframe{width:1280px;border:0;transform:scale(.25);transform-origin:0 0;pointer-events:none;position:absolute;top:0;left:0}
+.card span{font-size:14px;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+<h1>My To-Do : Daily Planner · screen designs</h1>
+<p>Every screen in light and dark theme. Select a screen to open it full size; the navigation inside each screen links to the others.</p>
+<h2>Light theme</h2>
+<div class="grid">
+<a class="card" href="Main.html"><div class="thumb" style="height:200px"><iframe src="Main.html" title="Today" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Today</span></a>
+<a class="card" href="Lists.html"><div class="thumb" style="height:200px"><iframe src="Lists.html" title="Lists and task details" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Lists and task details</span></a>
+<a class="card" href="Week.html"><div class="thumb" style="height:200px"><iframe src="Week.html" title="Calendar: week" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Calendar: week</span></a>
+<a class="card" href="Month.html"><div class="thumb" style="height:200px"><iframe src="Month.html" title="Calendar: month" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Calendar: month</span></a>
+<a class="card" href="Diary.html"><div class="thumb" style="height:200px"><iframe src="Diary.html" title="Diary" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Diary</span></a>
+<a class="card" href="Insights.html"><div class="thumb" style="height:225px"><iframe src="Insights.html" title="Insights" loading="lazy" tabindex="-1" style="height:900px"></iframe></div><span>Insights</span></a>
+<a class="card" href="Search.html"><div class="thumb" style="height:200px"><iframe src="Search.html" title="Search" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Search</span></a>
+<a class="card" href="Settings.html"><div class="thumb" style="height:400px"><iframe src="Settings.html" title="Settings" loading="lazy" tabindex="-1" style="height:1600px"></iframe></div><span>Settings</span></a>
+<a class="card" href="Shortcuts.html"><div class="thumb" style="height:240px"><iframe src="Shortcuts.html" title="Keyboard shortcuts" loading="lazy" tabindex="-1" style="height:960px"></iframe></div><span>Keyboard shortcuts</span></a>
+<a class="card" href="Welcome.html"><div class="thumb" style="height:200px"><iframe src="Welcome.html" title="First run" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>First run</span></a>
+<a class="card" href="Surfaces.html"><div class="thumb" style="height:200px"><iframe src="Surfaces.html" title="Quick add, reminders and tray" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Quick add, reminders and tray</span></a>
+<a class="card" href="States.html"><div class="thumb" style="height:225px"><iframe src="States.html" title="Empty, error and dialog states" loading="lazy" tabindex="-1" style="height:900px"></iframe></div><span>Empty, error and dialog states</span></a>
+</div>
+<h2>Dark theme</h2>
+<div class="grid">
+<a class="card" href="Today-Dark.html"><div class="thumb" style="height:200px"><iframe src="Today-Dark.html" title="Today" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Today</span></a>
+<a class="card" href="Lists-Dark.html"><div class="thumb" style="height:200px"><iframe src="Lists-Dark.html" title="Lists and task details" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Lists and task details</span></a>
+<a class="card" href="Week-Dark.html"><div class="thumb" style="height:200px"><iframe src="Week-Dark.html" title="Calendar: week" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Calendar: week</span></a>
+<a class="card" href="Month-Dark.html"><div class="thumb" style="height:200px"><iframe src="Month-Dark.html" title="Calendar: month" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Calendar: month</span></a>
+<a class="card" href="Diary-Dark.html"><div class="thumb" style="height:200px"><iframe src="Diary-Dark.html" title="Diary" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Diary</span></a>
+<a class="card" href="Insights-Dark.html"><div class="thumb" style="height:225px"><iframe src="Insights-Dark.html" title="Insights" loading="lazy" tabindex="-1" style="height:900px"></iframe></div><span>Insights</span></a>
+<a class="card" href="Search-Dark.html"><div class="thumb" style="height:200px"><iframe src="Search-Dark.html" title="Search" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Search</span></a>
+<a class="card" href="Settings-Dark.html"><div class="thumb" style="height:400px"><iframe src="Settings-Dark.html" title="Settings" loading="lazy" tabindex="-1" style="height:1600px"></iframe></div><span>Settings</span></a>
+<a class="card" href="Shortcuts-Dark.html"><div class="thumb" style="height:240px"><iframe src="Shortcuts-Dark.html" title="Keyboard shortcuts" loading="lazy" tabindex="-1" style="height:960px"></iframe></div><span>Keyboard shortcuts</span></a>
+<a class="card" href="Welcome-Dark.html"><div class="thumb" style="height:200px"><iframe src="Welcome-Dark.html" title="First run" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>First run</span></a>
+<a class="card" href="Surfaces-Dark.html"><div class="thumb" style="height:200px"><iframe src="Surfaces-Dark.html" title="Quick add, reminders and tray" loading="lazy" tabindex="-1" style="height:800px"></iframe></div><span>Quick add, reminders and tray</span></a>
+<a class="card" href="States-Dark.html"><div class="thumb" style="height:225px"><iframe src="States-Dark.html" title="Empty, error and dialog states" loading="lazy" tabindex="-1" style="height:900px"></iframe></div><span>Empty, error and dialog states</span></a>
+</div>
+<h2>Shared parts</h2>
+<div class="grid">
+<a class="card" href="TitleBar.html"><div class="thumb" style="height:12px"><iframe src="TitleBar.html" title="Title bar" loading="lazy" tabindex="-1" style="height:48px"></iframe></div><span>Title bar</span></a>
+<a class="card" href="NavPane.html"><div class="thumb" style="height:188px"><iframe src="NavPane.html" title="Navigation pane" loading="lazy" tabindex="-1" style="height:752px"></iframe></div><span>Navigation pane</span></a>
+</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<Page
+    x:Class="MyTodo.App.Views.ListsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Page.Resources>
+        <DataTemplate x:Key="ListCardTemplate">
+            <Grid Padding="16,14" ColumnSpacing="14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Border Width="34" Height="34" CornerRadius="17" Background="{Binding SoftBrush}" VerticalAlignment="Center">
+                    <Ellipse Width="12" Height="12" Fill="{Binding ColorBrush}" />
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding CountText}" Style="{StaticResource SecondaryTextStyle}" />
+                </StackPanel>
+                <Button Grid.Column="2" Content="Open" Click="Open_Click" Tag="{Binding Id}" VerticalAlignment="Center"
+                        AutomationProperties.Name="{Binding OpenLabel}" />
+                <Button Grid.Column="3" VerticalAlignment="Center" Background="Transparent" BorderThickness="0"
+                        AutomationProperties.Name="{Binding MenuLabel}" ToolTipService.ToolTip="List options">
+                    <FontIcon Glyph="&#xE712;" FontSize="14" />
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Edit" Icon="Edit" Click="Edit_Click" Tag="{Binding Id}" />
+                            <MenuFlyoutItem Text="Delete" Icon="Delete" Click="Delete_Click" Tag="{Binding Id}" />
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Padding="28,20,28,20" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Spacing="2">
+                <TextBlock Text="Lists" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="Every list you have, and what is still open in it. Open a list to work on its tasks."
+                           Style="{StaticResource SecondaryTextStyle}" />
+            </StackPanel>
+            <Button x:Name="NewListButton" Grid.Column="1" Style="{StaticResource AccentButtonStyle}" VerticalAlignment="Center"
+                    Click="NewList_Click" AutomationProperties.Name="New list">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE710;" FontSize="14" />
+                    <TextBlock Text="New list" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <InfoBar x:Name="UndoBar" Grid.Row="1" IsOpen="False" Severity="Informational" />
+
+        <ListView x:Name="ListsView" Grid.Row="2" SelectionMode="None" IsItemClickEnabled="True" ItemClick="List_ItemClick"
+                  ItemTemplate="{StaticResource ListCardTemplate}" AutomationProperties.Name="Your lists">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0,0,0,8" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="Background" Value="{ThemeResource SurfaceBrush}" />
+                    <Setter Property="BorderBrush" Value="{ThemeResource LineBrush}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="8" />
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+    </Grid>
+</Page>

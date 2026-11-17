@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Search</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height: 800px; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 14px">
+<dc-import name="TitleBar" theme="{{theme}}" query="roadmap" hint-size="100%,48px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="NavPane" theme="{{theme}}" active="search" hint-size="248px,752px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; background: {{t.surface2}}; border-top-left-radius: 8px; border: 1px solid {{t.border}}; box-sizing: border-box; padding: 24px 28px; display: flex; flex-direction: column; gap: 16px">
+<div>
+<h1 style="margin: 0; font-size: 28px; font-weight: 600">Results for “roadmap”</h1>
+<p style="margin: 4px 0 0; color: {{t.text2}}">9 results across tasks, events, diary, archive and attachments</p>
+</div>
+<div role="tablist" aria-label="Filter results" style="display: flex; gap: 6px; flex-wrap: wrap">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="6">
+<button role="tab" aria-selected="{{f.sel}}" style="{{f.style}}">{{f.label}}</button>
+</sc-for>
+</div>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="5">
+<section style="display: flex; flex-direction: column; gap: 6px; max-width: 880px">
+<h2 style="margin: 6px 0 0; font-size: 13px; font-weight: 600; color: {{t.text2}}">{{g.name}}</h2>
+<div style="border-radius: 8px; background: {{t.surface}}; border: 1px solid {{t.border}}; overflow: hidden">
+<sc-for list="{{g.items}}" as="r" hint-placeholder-count="2">
+<a href="{{r.href}}" style="display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-bottom: 1px solid {{t.border}}; color: {{t.text}}; text-decoration: none">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.text2}}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{g.icon}}"></path></svg>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.a}}<mark style="background: {{t.amberSoft}}; color: {{t.text}}; font-weight: 600; border-radius: 2px; padding: 0 1px">{{r.m}}</mark>{{r.b}}</span>
+<span style="font-size: 12px; color: {{t.text2}}">{{r.meta}}</span>
+</span>
+</a>
+</sc-for>
+</div>
+</section>
+</sc-for>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',surface:'#FFFFFF',surface2:'#F6F8F6',hover:'#E9EEEA',border:'#DCE2DE',text:'#1A1F1C',text2:'#56605A',accent:'#17784C',accentFill:'#187A4E',onAccent:'#FFFFFF',accentSoft:'#E2F2E9',amber:'#8F5500',amberSoft:'#FDF1DC'},
+      dark: {bg:'#191C1A',surface:'#232725',surface2:'#2B302D',hover:'#323834',border:'#3A413C',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6',accentFill:'#4CC38A',onAccent:'#05130C',accentSoft:'#1C3A2B',amber:'#F4BC5C',amberSoft:'#5A4318'}
+    };
+    const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+    const t = T[theme];
+    const d = theme === 'dark';
+    const L = d ? 'Lists-Dark.dc.html' : 'Lists.dc.html', W = d ? 'Week-Dark.dc.html' : 'Week.dc.html', D = d ? 'Diary-Dark.dc.html' : 'Diary.dc.html';
+    const fstyle = (on) => 'font: inherit; font-size: 13px; padding: 5px 14px; border-radius: 14px; border: 1px solid ' + (on ? t.accent : t.border) + '; background: ' + (on ? t.accentSoft : t.surface) + '; color: ' + (on ? t.accent : t.text) + ';' + (on ? ' font-weight: 600;' : '');
+    const filters = ['All · 9', 'Tasks · 3', 'Events · 2', 'Diary · 2', 'Archive · 1', 'Attachments · 1'].map((label, i) => ({ label, sel: i === 0 ? 'true' : 'false', style: fstyle(i === 0) }));
+    const r = (a, m, b, meta, href) => ({ a, m, b, meta, href });
+    const groups = [
+      { name: 'Tasks', icon: 'M5 12.5l4.5 4.5L19 7.5', items: [r('Review Q4 ', 'roadmap', ' deck', 'Work · Today · P1', L), r('Draft 2027 ', 'roadmap', ' outline', 'Work · 20 Nov', L), r('Share ', 'roadmap', ' feedback with design', 'Work · No date', L)] },
+      { name: 'Events', icon: 'M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v12a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5zM4 10h16M8 3v4M16 3v4', items: [r('Q4 ', 'roadmap', '', 'Focus block · Tue 10 Nov, 10:00 – 11:00', W), r('Leadership review: ', 'roadmap', '', 'Meeting · Mon 16 Nov, 11:00', W)] },
+      { name: 'Diary', icon: 'M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3M9 7h6', items: [r('The morning went to the Q4 ', 'roadmap', ' review.', 'Thu 12 Nov', D), r('Pushed the ', 'roadmap', ' sync to next week.', 'Thu 5 Nov', D)] },
+      { name: 'Archive', icon: 'M3.5 5h17v4h-17zM5 9v10h14V9M10 13h4', items: [r('', 'Roadmap', ' kickoff notes', 'Completed 3 Oct · archived', L)] },
+      { name: 'Attachments', icon: 'M20 11.5l-7.8 7.8a4.6 4.6 0 0 1-6.5-6.5l8-8a3 3 0 0 1 4.3 4.3l-7.9 7.9a1.5 1.5 0 0 1-2.1-2.1L15 7.9', items: [r('Q4-', 'roadmap', '-v3.pptx', 'On “Review Q4 roadmap deck” · 4.2 MB', L)] }
+    ];
+    return { theme, t, filters, groups };
+  }
+}
+</script>
+</body>
+</html>

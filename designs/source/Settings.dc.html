@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height: 1600px; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 14px">
+<dc-import name="TitleBar" theme="{{theme}}" hint-size="100%,48px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="NavPane" theme="{{theme}}" active="settings" hint-size="248px,752px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; background: {{t.surface2}}; border-top-left-radius: 8px; border: 1px solid {{t.border}}; box-sizing: border-box; padding: 24px 28px; display: flex; flex-direction: column; gap: 18px">
+<div>
+<h1 style="margin: 0; font-size: 28px; font-weight: 600">Settings</h1>
+<p style="margin: 4px 0 0; color: {{t.text2}}">Defaults shown. Changes save immediately and sync if you are signed in.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 18px; align-items: start">
+<sc-for list="{{sections}}" as="s" hint-placeholder-count="8">
+<section style="display: flex; flex-direction: column; gap: 4px">
+<h2 style="margin: 0 0 6px; font-size: 15px; font-weight: 600">{{s.title}}</h2>
+<sc-for list="{{s.rows}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 10px 14px; box-sizing: border-box; border-radius: 6px; background: {{t.surface}}; border: 1px solid {{t.border}}; flex-wrap: wrap">
+<div style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span>{{r.label}}</span>
+<sc-if value="{{r.desc}}" hint-placeholder-val="{{true}}"><span style="font-size: 12px; color: {{t.text2}}">{{r.desc}}</span></sc-if>
+</div>
+<sc-if value="{{r.tog}}" hint-placeholder-val="{{false}}">
+<span style="display: flex; align-items: center; gap: 10px; font-size: 13px">{{r.togText}}<button role="switch" aria-checked="{{r.on}}" aria-label="{{r.label}}" style="{{r.swStyle}}"><span style="{{r.knobStyle}}"></span></button></span>
+</sc-if>
+<sc-if value="{{r.sel}}" hint-placeholder-val="{{false}}">
+<button aria-haspopup="listbox" aria-label="{{r.label}}: {{r.sel}}" style="font: inherit; font-size: 13px; display: flex; align-items: center; gap: 10px; min-width: 170px; justify-content: space-between; padding: 6px 10px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface2}}; color: {{t.text}}">{{r.sel}}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+</sc-if>
+<sc-if value="{{r.txt}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px; color: {{t.text2}}">{{r.txt}}</span></sc-if>
+<sc-if value="{{r.kbd}}" hint-placeholder-val="{{false}}"><kbd style="font: inherit; font-size: 12px; padding: 3px 8px; border-radius: 4px; border: 1px solid {{t.border}}; border-bottom-width: 2px; background: {{t.surface2}}">{{r.kbd}}</kbd></sc-if>
+<sc-if value="{{r.chips}}" hint-placeholder-val="{{false}}">
+<span style="display: flex; gap: 6px; flex-wrap: wrap">
+<sc-for list="{{r.chips}}" as="c" hint-placeholder-count="3"><button aria-pressed="true" style="font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 12px; border: 1px solid {{t.accent}}; background: {{t.accentSoft}}; color: {{t.accent}}">{{c}}</button></sc-for>
+</span>
+</sc-if>
+<sc-if value="{{r.radio}}" hint-placeholder-val="{{false}}">
+<span role="radiogroup" aria-label="{{r.label}}" style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px">
+<sc-for list="{{r.radio}}" as="o" hint-placeholder-count="3"><label style="display: flex; align-items: center; gap: 6px"><input type="radio" name="theme-{{theme}}" checked="{{o.on}}" style="accent-color: {{t.accentFill}}; margin: 0">{{o.label}}</label></sc-for>
+</span>
+</sc-if>
+<sc-if value="{{r.btn}}" hint-placeholder-val="{{false}}"><button style="{{r.btnStyle}}">{{r.btn}}</button></sc-if>
+<sc-if value="{{r.btn2}}" hint-placeholder-val="{{false}}"><button style="{{r.btnStyle}}">{{r.btn2}}</button></sc-if>
+<sc-if value="{{r.link}}" hint-placeholder-val="{{false}}"><a href="{{r.link}}" style="font-size: 13px; color: {{t.accent}}; text-decoration: none">{{r.linkText}}</a></sc-if>
+</div>
+</sc-for>
+</section>
+</sc-for>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":1600}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',surface:'#FFFFFF',surface2:'#F6F8F6',border:'#DCE2DE',text:'#1A1F1C',text2:'#56605A',accent:'#17784C',accentFill:'#187A4E',onAccent:'#FFFFFF',accentSoft:'#E2F2E9',danger:'#B42318',knobOff:'#56605A'},
+      dark: {bg:'#191C1A',surface:'#232725',surface2:'#2B302D',border:'#3A413C',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6',accentFill:'#4CC38A',onAccent:'#05130C',accentSoft:'#1C3A2B',danger:'#FF9A8F',knobOff:'#B2BBB5'}
+    };
+    const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+    const t = T[theme];
+    const btnStyle = (danger) => 'font: inherit; font-size: 13px; padding: 6px 14px; border-radius: 4px; border: 1px solid ' + t.border + '; background: ' + t.surface2 + '; color: ' + (danger ? t.danger : t.text) + ';';
+    const base = { desc: '', tog: false, sel: '', txt: '', kbd: '', chips: false, radio: false, btn: '', btn2: '', link: '', linkText: '' };
+    const row = (label, desc, extra) => {
+      const r = Object.assign({}, base, { label, desc }, extra || {});
+      if (r.tog) {
+        const on = r.on === 'true';
+        r.togText = on ? 'On' : 'Off';
+        r.swStyle = 'position: relative; width: 40px; height: 20px; border-radius: 10px; padding: 0; border: 1px solid ' + (on ? t.accentFill : t.knobOff) + '; background: ' + (on ? t.accentFill : 'transparent') + ';';
+        r.knobStyle = 'position: absolute; top: 3px; left: ' + (on ? '23px' : '4px') + '; width: 12px; height: 12px; border-radius: 50%; background: ' + (on ? t.onAccent : t.knobOff) + ';';
+      }
+      r.btnStyle = btnStyle(!!r.danger);
+      return r;
+    };
+    const on = { tog: true, on: 'true' };
+    const sc = theme === 'dark' ? 'Shortcuts-Dark.dc.html' : 'Shortcuts.dc.html';
+    const sections = [
+      { title: 'Account and sync', rows: [
+        row('Google account', 'Signed in as [your Gmail address]', { btn: 'Sign out' }),
+        row('Sync now', 'Last synced today at 11:03 · nothing waiting', { btn: 'Sync now' }),
+        row('Automatic sync', 'How often to sync while the app is running', { sel: 'Every 30 minutes' }),
+        row('Sync when the app starts', '', on),
+        row('Delete cloud copy', 'Removes your data from Google Drive. Data on this PC stays.', { btn: 'Delete cloud copy', danger: true })
+      ] },
+      { title: 'Reminders and notifications', rows: [
+        row('Timed tasks and events', 'Before the start time', { chips: ['1 hour', '30 min', '15 min'] }),
+        row('Tasks with a date but no time', '3:00 PM the day before and 9:00 AM on the day', { btn: 'Change' }),
+        row('Reminder sound', '', { sel: 'Windows Notify (default)' }),
+        row('Snooze options', '5 min, 15 min, 1 hour, tomorrow 9:00 AM', { btn: 'Edit' }),
+        row('Daily planning prompt', 'Every weekday at 9:00 AM', on),
+        row('Windows notification settings', 'Focus and Do Not Disturb are respected', { btn: 'Open Windows settings' })
+      ] },
+      { title: 'Appearance', rows: [
+        row('App theme', '', { radio: [{ label: 'Light', on: false }, { label: 'Dark', on: false }, { label: 'Use system setting', on: true }] }),
+        row('Accent color', '', { sel: 'Planner green' }),
+        row('Text size', 'Follows the Windows text size setting', { txt: 'System: 100%' })
+      ] },
+      { title: 'Calendar', rows: [
+        row('Working hours', '', { sel: '9:00 – 18:00, Mon – Fri' }),
+        row('First day of the week', '', { sel: 'Monday' }),
+        row('Length of a new time block', 'When you drag a task onto the calendar', { sel: '30 minutes' }),
+        row('Show weekends in week view', '', on)
+      ] },
+      { title: 'Tasks and attachments', rows: [
+        row('Archive completed tasks', '', { sel: 'After 30 days' }),
+        row('Attachment size limit', 'Larger files are rejected with a message', { txt: '10 MB per file' }),
+        row('Remove deleted items permanently', '', { txt: '30 days after sync' })
+      ] },
+      { title: 'Startup and tray', rows: [
+        row('Launch at Windows startup', '', on),
+        row('Start minimized to the tray', '', on),
+        row('Close button keeps the app in the tray', 'Reminders keep working either way', on),
+        row('Quick add shortcut', 'Works from anywhere in Windows', { kbd: 'Win + Shift + T', btn: 'Change' }),
+        row('Keyboard shortcuts', '', { link: sc, linkText: 'View all shortcuts' })
+      ] },
+      { title: 'Backup and data', rows: [
+        row('Daily backup on this PC', 'Keeps the last 3 days · last backup today at 08:00', on),
+        row('Back up now', '', { btn: 'Back up now' }),
+        row('Restore from a backup', '', { btn: 'Choose backup' }),
+        row('Export', 'All data as JSON, calendar as .ics', { btn: 'Export JSON', btn2: 'Export .ics' })
+      ] },
+      { title: 'About', rows: [
+        row('Version', '', { txt: '1.0.0' }),
+        row('Data collection', 'None: no telemetry, analytics or ads', { txt: '' }),
+        row('Privacy policy', '', { link: '#', linkText: 'Open privacy policy' })
+      ] }
+    ];
+    return { theme, t, sections };
+  }
+}
+</script>
+</body>
+</html>

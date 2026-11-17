@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lists and task details</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height: 800px; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 14px">
+<dc-import name="TitleBar" theme="{{theme}}" hint-size="100%,48px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="NavPane" theme="{{theme}}" active="lists" hint-size="248px,752px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; background: {{t.surface2}}; border-top-left-radius: 8px; border: 1px solid {{t.border}}; box-sizing: border-box; display: flex; flex-wrap: wrap">
+<section style="flex: 999 1 420px; min-width: 0; padding: 24px 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+<span style="width: 12px; height: 12px; border-radius: 50%; background: #1F8A5B"></span>
+<h1 style="margin: 0; font-size: 28px; font-weight: 600; flex: 1">Work</h1>
+<button style="font: inherit; padding: 6px 12px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}">Sort: Due date</button>
+<button style="font: inherit; padding: 6px 12px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}">Filter: #q4</button>
+<button aria-label="More list options" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 12h.01M12 12h.01M18 12h.01"></path></svg></button>
+</div>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 8px 0 2px; font-size: 13px; font-weight: 600; color: {{t.text2}}">{{g.name}}</h2>
+<div style="border-radius: 8px; background: {{t.surface}}; border: 1px solid {{t.border}}; overflow: hidden">
+<sc-for list="{{g.items}}" as="k" hint-placeholder-count="3">
+<div style="{{k.rowStyle}}">
+<span style="flex: none; width: 18px; height: 18px; border-radius: 50%; border: 2px solid {{k.ring}}"></span>
+<span style="flex: 1; min-width: 0; font-weight: 500">{{k.title}}</span>
+<span style="font-size: 12px; color: {{t.text2}}">{{k.meta}}</span>
+<span style="font-size: 12px; font-weight: 600; color: {{k.prColor}}; width: 20px; text-align: right">{{k.pr}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</section>
+<aside aria-label="Task details" style="flex: 1 1 380px; min-width: 0; max-width: 440px; box-sizing: border-box; padding: 20px; background: {{t.surface}}; border-left: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: flex-start; gap: 10px">
+<span style="flex: none; width: 20px; height: 20px; margin-top: 3px; border-radius: 50%; border: 2px solid {{t.danger}}"></span>
+<h2 style="margin: 0; flex: 1; font-size: 18px; font-weight: 600; line-height: 1.35">Review Q4 roadmap deck</h2>
+<button aria-label="Close details" style="width: 28px; height: 28px; border: 0; border-radius: 4px; background: transparent; color: {{t.text2}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px 12px; font-size: 13px; align-items: center">
+<span style="color: {{t.text2}}">List</span><span>Work</span>
+<span style="color: {{t.text2}}">Due</span><span>Today, 12 Nov · 11:30</span>
+<span style="color: {{t.text2}}">Time block</span><span>10:00 – 11:30 <a href="{{weekHref}}" style="color: {{t.accent}}; text-decoration: none">· Show in calendar</a></span>
+<span style="color: {{t.text2}}">Priority</span><span style="color: {{t.danger}}; font-weight: 600">P1 · Urgent</span>
+<span style="color: {{t.text2}}">Repeat</span><span>Does not repeat</span>
+<span style="color: {{t.text2}}">Tags</span><span style="display: flex; gap: 6px; flex-wrap: wrap"><span style="padding: 2px 8px; border-radius: 10px; background: {{t.surface2}}; border: 1px solid {{t.border}}">#q4</span><span style="padding: 2px 8px; border-radius: 10px; background: {{t.surface2}}; border: 1px solid {{t.border}}">#planning</span></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h3 style="margin: 0; font-size: 13px; font-weight: 600">Reminders</h3>
+<div style="display: flex; gap: 6px; flex-wrap: wrap">
+<sc-for list="{{reminders}}" as="r" hint-placeholder-count="3">
+<button aria-pressed="true" style="font: inherit; font-size: 12px; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; border: 1px solid {{t.accent}}; background: {{t.accentSoft}}; color: {{t.accent}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0"></path></svg>{{r}}</button>
+</sc-for>
+<button style="font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 12px; border: 1px dashed {{t.border}}; background: transparent; color: {{t.text2}}">+ Add</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 13px; font-weight: 600">Subtasks · 1 of 3</h3>
+<sc-for list="{{subs}}" as="s" hint-placeholder-count="3">
+<label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: {{s.color}}"><input type="checkbox" checked="{{s.done}}" style="accent-color: {{t.accentFill}}; width: 16px; height: 16px; margin: 0"><span style="text-decoration: {{s.deco}}">{{s.title}}</span></label>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h3 style="margin: 0; font-size: 13px; font-weight: 600">Attachments</h3>
+<sc-for list="{{files}}" as="f" hint-placeholder-count="2">
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; background: {{t.surface2}}; border: 1px solid {{t.border}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.text2}}" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5zM14 3v4.5h4.5"></path></svg>
+<span style="flex: 1; min-width: 0; font-size: 13px">{{f.name}}</span>
+<span style="font-size: 12px; color: {{t.text2}}">{{f.size}}</span>
+</div>
+</sc-for>
+<button style="font: inherit; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 6px; border: 1px dashed {{t.border}}; background: transparent; color: {{t.text2}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.5l-7.8 7.8a4.6 4.6 0 0 1-6.5-6.5l8-8a3 3 0 0 1 4.3 4.3l-7.9 7.9a1.5 1.5 0 0 1-2.1-2.1L15 7.9"></path></svg>Attach or drop a file (up to 10 MB)</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h3 style="margin: 0; font-size: 13px; font-weight: 600">Time spent · 2 h 57 min</h3>
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; background: {{t.accentSoft}}">
+<span style="flex: 1; font-size: 13px">Running since 10:23</span>
+<span style="font-variant-numeric: tabular-nums; font-weight: 600; color: {{t.accent}}">0:42:10</span>
+<button style="font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 4px; border: 0; background: {{t.accentFill}}; color: {{t.onAccent}}">Stop</button>
+</div>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 12px; color: {{t.text2}}">
+<span>Wed 11 Nov · timer</span><span>1 h 15 min</span>
+<span>Tue 10 Nov · time block</span><span>1 h 00 min</span>
+<span>Add time manually</span><span><a href="#" style="color: {{t.accent}}; text-decoration: none">+ Add</a></span>
+</div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Notes
+<textarea rows="3" style="font: inherit; font-weight: 400; font-size: 13px; padding: 8px 10px; border-radius: 6px; border: 1px solid {{t.border}}; background: {{t.surface2}}; color: {{t.text}}; resize: vertical">Check revenue slide against finance numbers before the leadership review.</textarea>
+</label>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: {{t.text2}}">
+<span>Created 10 Nov · Synced</span>
+<button style="font: inherit; font-size: 12px; display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 4px; border: 0; background: transparent; color: {{t.danger}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6 7l1 13h10l1-13"></path></svg>Delete task</button>
+</div>
+</aside>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',surface:'#FFFFFF',surface2:'#F6F8F6',hover:'#E9EEEA',border:'#DCE2DE',text:'#1A1F1C',text2:'#56605A',accent:'#17784C',accentFill:'#187A4E',onAccent:'#FFFFFF',accentSoft:'#E2F2E9',amber:'#8F5500',amberSoft:'#FDF1DC',danger:'#B42318',dangerSoft:'#FDECEA',meetFill:'#E5EEFB',meetText:'#1D4E9A'},
+      dark: {bg:'#191C1A',surface:'#232725',surface2:'#2B302D',hover:'#323834',border:'#3A413C',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6',accentFill:'#4CC38A',onAccent:'#05130C',accentSoft:'#1C3A2B',amber:'#F4BC5C',amberSoft:'#3A2C12',danger:'#FF9A8F',dangerSoft:'#3D1F1C',meetFill:'#1F3150',meetText:'#AFCBF5'}
+    };
+    const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+    const t = T[theme];
+    const row = (sel) => 'display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-bottom: 1px solid ' + t.border + ';' + (sel ? ' background: ' + t.accentSoft + ';' : '');
+    const mk = (title, meta, pr, sel) => ({ title, meta, pr, rowStyle: row(sel), prColor: pr === 'P1' ? t.danger : pr === 'P2' ? t.amber : t.text2, ring: pr === 'P1' ? t.danger : pr === 'P2' ? t.amber : t.text2 });
+    const groups = [
+      { name: 'Today', items: [mk('Review Q4 roadmap deck', '10:00 · 2 files', 'P1', true), mk('Reply to vendor contract email', 'Due today', 'P2', false), mk('Update test plan for sync', '15:30 · 1/3', 'P3', false)] },
+      { name: 'This week', items: [mk('Prepare sprint demo', 'Fri 13 Nov', 'P2', false), mk('Draft hiring plan for Q1', 'Fri 13 Nov', '', false), mk('Weekly status email', 'Every Friday', '', false)] },
+      { name: 'Later', items: [mk('Clean up shared drive folders', 'No date', '', false), mk('Read architecture review notes', '20 Nov', '', false)] }
+    ];
+    const subs = [
+      { title: 'Check revenue slide', done: true, color: t.text2, deco: 'line-through' },
+      { title: 'Update hiring numbers', done: false, color: t.text, deco: 'none' },
+      { title: 'Send comments to Priya', done: false, color: t.text, deco: 'none' }
+    ];
+    return { theme, t, groups, subs,
+      reminders: ['1 hour before', '30 min before', '15 min before'],
+      files: [{ name: 'Q4-roadmap-v3.pptx', size: '4.2 MB' }, { name: 'Finance-notes.pdf', size: '820 KB' }],
+      weekHref: theme === 'dark' ? 'Week-Dark.dc.html' : 'Week.dc.html' };
+  }
+}
+</script>
+</body>
+</html>

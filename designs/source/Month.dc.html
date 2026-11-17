@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calendar: month</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height: 800px; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif; font-size: 14px">
+<dc-import name="TitleBar" theme="{{theme}}" hint-size="100%,48px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="NavPane" theme="{{theme}}" active="calendar" hint-size="248px,752px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; background: {{t.surface2}}; border-top-left-radius: 8px; border: 1px solid {{t.border}}; box-sizing: border-box; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 10px; padding: 16px 20px; flex-wrap: wrap; border-bottom: 1px solid {{t.border}}">
+<h1 style="margin: 0; font-size: 22px; font-weight: 600; margin-right: 8px">November 2026</h1>
+<button style="font: inherit; padding: 5px 12px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}">Today</button>
+<button aria-label="Previous month" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+<button aria-label="Next month" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+<div style="flex: 1 1 auto"></div>
+<div role="tablist" aria-label="Calendar view" style="display: flex; padding: 2px; border-radius: 6px; background: {{t.surface}}; border: 1px solid {{t.border}}">
+<button role="tab" aria-selected="false" style="font: inherit; font-size: 13px; padding: 5px 12px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}">Day</button>
+<button role="tab" aria-selected="false" style="font: inherit; font-size: 13px; padding: 5px 12px; border: 0; border-radius: 4px; background: transparent; color: {{t.text}}">Work week</button>
+<a role="tab" aria-selected="false" href="{{weekHref}}" style="font-size: 13px; padding: 5px 12px; border-radius: 4px; color: {{t.text}}; text-decoration: none">Week</a>
+<button role="tab" aria-selected="true" style="font: inherit; font-size: 13px; font-weight: 600; padding: 5px 12px; border: 0; border-radius: 4px; background: {{t.accentSoft}}; color: {{t.accent}}">Month</button>
+</div>
+<button style="font: inherit; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 4px; border: 0; background: {{t.accentFill}}; color: {{t.onAccent}}; font-weight: 600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>New event</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<div style="flex: 999 1 520px; min-width: 0; overflow-x: auto; padding: 0 0 12px; box-sizing: border-box">
+<div style="min-width: 600px">
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
+<sc-for list="{{dows}}" as="w" hint-placeholder-count="7"><span style="padding: 8px 10px; font-size: 12px; color: {{t.text2}}">{{w}}</span></sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: 100px; border-top: 1px solid {{t.border}}">
+<sc-for list="{{cells}}" as="c" hint-placeholder-count="42">
+<div style="{{c.style}}">
+<span style="{{c.numStyle}}">{{c.num}}</span>
+<sc-for list="{{c.ev}}" as="e" hint-placeholder-count="2">
+<span style="{{e.style}}">{{e.title}}</span>
+</sc-for>
+<sc-if value="{{c.more}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; color: {{t.text2}}; padding-left: 4px">{{c.more}}</span></sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+<aside aria-label="Selected day" style="flex: 1 1 260px; max-width: 300px; box-sizing: border-box; padding: 16px; border-left: 1px solid {{t.border}}; background: {{t.surface}}; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Thursday, 12 November</h2>
+<p style="margin: 0; font-size: 12px; color: {{t.text2}}">5 events · 4 h 15 min blocked</p>
+<sc-for list="{{agenda}}" as="a" hint-placeholder-count="5">
+<div style="display: flex; gap: 10px; padding: 8px 10px; border-radius: 6px; background: {{a.bg}}; color: {{a.fg}}; font-size: 13px">
+<span style="flex: none; width: 92px; font-variant-numeric: tabular-nums">{{a.time}}</span>
+<span style="flex: 1; min-width: 0; font-weight: 500">{{a.title}}</span>
+</div>
+</sc-for>
+<a href="{{todayHref}}" style="margin-top: 4px; font-size: 13px; color: {{t.accent}}; text-decoration: none">Open in Today</a>
+</aside>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = {
+      light: {bg:'#EEF2EF',surface:'#FFFFFF',surface2:'#F6F8F6',hover:'#E9EEEA',border:'#DCE2DE',text:'#1A1F1C',text2:'#56605A',accent:'#17784C',accentFill:'#187A4E',onAccent:'#FFFFFF',accentSoft:'#E2F2E9',amber:'#8F5500',amberSoft:'#FDF1DC',danger:'#B42318',dangerSoft:'#FDECEA',meetFill:'#E5EEFB',meetText:'#1D4E9A'},
+      dark: {bg:'#191C1A',surface:'#232725',surface2:'#2B302D',hover:'#323834',border:'#3A413C',text:'#F1F4F2',text2:'#B2BBB5',accent:'#72D9A6',accentFill:'#4CC38A',onAccent:'#05130C',accentSoft:'#1C3A2B',amber:'#F4BC5C',amberSoft:'#3A2C12',danger:'#FF9A8F',dangerSoft:'#3D1F1C',meetFill:'#1F3150',meetText:'#AFCBF5'}
+    };
+    const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+    const t = T[theme];
+    const K = { m: [t.meetFill, t.meetText], f: [t.accentSoft, t.accent], p: [t.amberSoft, t.amber] };
+    const pill = (title, k) => ({ title, style: 'display: block; font-size: 11px; padding: 2px 6px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: ' + K[k][0] + '; color: ' + K[k][1] + ';' });
+    const E = {
+      2: [pill('Sprint planning', 'm')], 5: [pill('Quarterly review', 'm')], 9: [pill('Sprint planning', 'm'), pill('Hiring plan', 'f')],
+      10: [pill('Q4 roadmap', 'f'), pill('Vendor call', 'm')], 11: [pill('Architecture review', 'm'), pill('Test plan', 'f')],
+      12: [pill('Review Q4 roadmap', 'f'), pill('1:1 with Priya', 'm')], 13: [pill('Sprint demo', 'm'), pill('Weekly status', 'f')],
+      14: [pill('Gym', 'p')], 16: [pill('Leadership review', 'm')], 19: [pill('Dentist', 'p')], 20: [pill('Architecture notes', 'f')],
+      23: [pill('Sprint planning', 'm')], 26: [pill('Team offsite', 'm')], 27: [pill('Sprint demo', 'm')], 30: [pill('Q1 kickoff', 'm')]
+    };
+    const more = { 12: '+3 more', 13: '+1 more', 11: '+1 more' };
+    const cells = [];
+    for (let i = 0; i < 42; i++) {
+      let num, inMonth = true;
+      if (i < 6) { num = 26 + i; inMonth = false; }
+      else if (i - 5 <= 30) { num = i - 5; }
+      else { num = i - 35; inMonth = false; }
+      const today = inMonth && num === 12;
+      const weekend = i % 7 >= 5;
+      cells.push({
+        num: String(num), ev: inMonth && E[num] ? E[num] : [], more: inMonth && more[num] ? more[num] : '',
+        style: 'box-sizing: border-box; padding: 6px; display: flex; flex-direction: column; gap: 3px; overflow: hidden; border-right: 1px solid ' + t.border + '; border-bottom: 1px solid ' + t.border + '; background: ' + (today ? t.accentSoft : weekend ? t.bg : 'transparent') + ';',
+        numStyle: 'font-size: 12px; font-weight: 600; padding: 2px 4px; color: ' + (!inMonth ? t.text2 : today ? t.accent : t.text) + ';' + (!inMonth ? ' opacity: 0.7;' : '')
+      });
+    }
+    const A = (time, title, k) => ({ time, title, bg: K[k][0], fg: K[k][1] });
+    return { theme, t, cells,
+      dows: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      agenda: [A('9:00 – 9:30', 'Stand-up', 'm'), A('10:00 – 11:30', 'Review Q4 roadmap deck', 'f'), A('12:30 – 13:15', 'Lunch', 'p'), A('14:00 – 15:00', '1:1 with Priya', 'm'), A('15:30 – 16:30', 'Update test plan for sync', 'f')],
+      weekHref: theme === 'dark' ? 'Week-Dark.dc.html' : 'Week.dc.html', todayHref: theme === 'dark' ? 'Today-Dark.dc.html' : 'Main.dc.html' };
+  }
+}
+</script>
+</body>
+</html>

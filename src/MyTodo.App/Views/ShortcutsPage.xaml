@@ -1,0 +1,16 @@
+<Page
+    x:Class="MyTodo.App.Views.ShortcutsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer>
+        <StackPanel Padding="28,20" Spacing="16">
+            <StackPanel>
+                <TextBlock Text="Keyboard shortcuts" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="Press Ctrl + / anywhere in the app to open this page." Foreground="{ThemeResource Text2Brush}" />
+            </StackPanel>
+            <!-- Columns are laid out in code: a VariableSizedWrapGrid gives every cell the height of the
+                 first one, which clipped every card longer than the shortest. -->
+            <Grid x:Name="Groups" ColumnSpacing="14" RowSpacing="14" SizeChanged="Groups_SizeChanged" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>
